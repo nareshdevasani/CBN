@@ -19,12 +19,6 @@ public class Instrument {
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
-	public float getPersent() {
-		return persent;
-	}
-	public void setPersent(float persent) {
-		this.persent = persent;
-	}
 	public String getSector() {
 		return sector;
 	}
@@ -32,9 +26,24 @@ public class Instrument {
 		this.sector = sector;
 	}
 
-	private String isin;
+	public String getSeries() {
+		return series;
+	}
+	public void setSeries(String series) {
+		this.series = series;
+	}
+
+	public String getListingDate() {
+		return listingDate;
+	}
+	public void setListingDate(String listingDate) {
+		this.listingDate = listingDate;
+	}
+
 	private String name;
 	private String symbol;
-	private float persent;
+	private String series;
 	private String sector;
+	private String listingDate;
+	private String isin;
 }
