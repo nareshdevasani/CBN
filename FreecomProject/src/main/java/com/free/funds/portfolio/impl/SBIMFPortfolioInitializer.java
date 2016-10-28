@@ -7,6 +7,7 @@ public class SBIMFPortfolioInitializer implements PortfolioInitializer {
 	@Override
 	public boolean initialize() {
 		System.out.println("Initialize called.");
+		
 		return false;
 	}
 

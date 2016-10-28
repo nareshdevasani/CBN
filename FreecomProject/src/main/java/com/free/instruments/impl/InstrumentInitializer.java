@@ -1,13 +1,13 @@
 package com.free.instruments.impl;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.free.dao.funds.InstrumentCRUD;
 import com.free.interfaces.funds.portfolio.PortfolioInitializer;
 import com.free.pojos.funds.Instrument;
 
@@ -25,9 +25,20 @@ public class InstrumentInitializer implements PortfolioInitializer {
 
 		// 3. parse data
 		List<Instrument> instruments = parseData(lines);
-		// 4. persist data
 
-		return false;
+		// 4. persist data
+		persistData(instruments);
+
+		return true;
+	}
+
+	private void persistData(List<Instrument> instruments) {
+		// TODO Auto-generated method stub
+		InstrumentCRUD instCrud = new InstrumentCRUD();
+		for (Instrument inst : instruments) {
+			instCrud.modify(inst);
+			System.out.println(inst.getName() + " - " + inst.getIsin());
+		}
 	}
 
 	private List<String> getDataFromFile() {
@@ -39,7 +50,7 @@ public class InstrumentInitializer implements PortfolioInitializer {
 			reader = new BufferedReader(new FileReader(instrumentsUrl.getFile()));
 			String line;
 			while((line = reader.readLine()) != null) {
-				System.out.println(line);
+				//System.out.println(line);
 				lines.add(line);
 			}
 			

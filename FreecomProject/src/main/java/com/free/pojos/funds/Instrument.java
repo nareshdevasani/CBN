@@ -1,6 +1,8 @@
 package com.free.pojos.funds;
 
-public class Instrument {
+import com.free.interfaces.dao.DataObject;
+
+public class Instrument implements DataObject {
 	public String getIsin() {
 		return isin;
 	}
