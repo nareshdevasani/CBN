@@ -1,9 +1,13 @@
 package com.free.pojos.funds;
 
+import java.util.Date;
 import java.util.List;
 
-public class MutualFundPortfolio {
+import com.free.interfaces.dao.DataObject;
+
+public class MutualFundPortfolio implements DataObject {
 	private String name;
+	private Date date;
 	private List<InstrumentAllocation> portfolio;
 
 	public String getName() {
@@ -12,6 +16,14 @@ public class MutualFundPortfolio {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 	public List<InstrumentAllocation> getPortfolio() {

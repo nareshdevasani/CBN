@@ -33,7 +33,6 @@ public class InstrumentInitializer implements PortfolioInitializer {
 	}
 
 	private void persistData(List<Instrument> instruments) {
-		// TODO Auto-generated method stub
 		InstrumentCRUD instCrud = new InstrumentCRUD();
 		for (Instrument inst : instruments) {
 			instCrud.modify(inst);
