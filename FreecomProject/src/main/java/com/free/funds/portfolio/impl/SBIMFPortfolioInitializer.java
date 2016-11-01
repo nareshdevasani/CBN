@@ -30,11 +30,11 @@ public class SBIMFPortfolioInitializer implements PortfolioInitializer {
 			for (MutualFundPortfolio fund : folios) {
 				crud.modify(fund);
 			}
+			System.out.println("All " + folios.size() + " SBI funds are initialized");
 		} catch (IOException e) {
 			System.out.println("Failed to initialize SBI MF portfilios");
 		}
 
-		System.out.println("All SBI funds are initialized");
 		return false;
 	}
 
