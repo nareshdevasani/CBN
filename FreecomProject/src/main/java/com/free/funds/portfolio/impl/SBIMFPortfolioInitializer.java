@@ -7,12 +7,16 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.poifs.filesystem.NPOIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.free.dao.funds.MutualFundPortfolioCRUD;
 import com.free.interfaces.funds.portfolio.PortfolioInitializer;
@@ -33,22 +37,26 @@ public class SBIMFPortfolioInitializer implements PortfolioInitializer {
 			System.out.println("All " + folios.size() + " SBI funds are initialized");
 		} catch (IOException e) {
 			System.out.println("Failed to initialize SBI MF portfilios");
+		} catch (EncryptedDocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return false;
 	}
 
-	private List<MutualFundPortfolio> getDataFromFile() throws IOException {
+	private List<MutualFundPortfolio> getDataFromFile() throws IOException, EncryptedDocumentException, InvalidFormatException {
 		String folder = Thread.currentThread().getContextClassLoader().getResource("resources/SBI/").getFile();
 		File[] files = new File(folder).listFiles();
-		NPOIFSFileSystem fs = null;
-		HSSFWorkbook wb = null;
+		Workbook wb = null;
 
 		List<MutualFundPortfolio> funds = new ArrayList<>();
 		for (File file : files) {
 			try {
-				fs = new NPOIFSFileSystem(file);
-				wb = new HSSFWorkbook(fs.getRoot(), true);
+				wb = WorkbookFactory.create(file);
 
 				int count = wb.getNumberOfSheets();
 				// igonre 1st workbook and read from second
@@ -113,9 +121,6 @@ public class SBIMFPortfolioInitializer implements PortfolioInitializer {
 					index++;
 				}
 			} finally {
-				if (null != fs) {
-					fs.close();
-				}
 				if (null != wb) {
 					wb.close();
 				}

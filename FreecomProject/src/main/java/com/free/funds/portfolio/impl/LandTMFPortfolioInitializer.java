@@ -24,20 +24,20 @@ import com.free.interfaces.funds.portfolio.PortfolioInitializer;
 import com.free.pojos.funds.InstrumentAllocation;
 import com.free.pojos.funds.MutualFundPortfolio;
 
-public class MiraeMFPortfolioInitializer implements PortfolioInitializer {
+public class LandTMFPortfolioInitializer implements PortfolioInitializer {
 
 	@Override
 	public boolean initialize() {
-		System.out.println("Mirae MF portfolio Initialize called.");
+		System.out.println("L&T MF portfolio Initialize called.");
 		try {
 			List<MutualFundPortfolio> folios = getDataFromFile();
 			MutualFundPortfolioCRUD crud = new MutualFundPortfolioCRUD();
 			for (MutualFundPortfolio fund : folios) {
 				crud.modify(fund);
 			}
-			System.out.println("All " + folios.size() + " Mirae funds are initialized");
+			System.out.println("All " + folios.size() + " L&T funds are initialized");
 		} catch (IOException e) {
-			System.out.println("Failed to initialize Mirae MF portfilios");
+			System.out.println("Failed to initialize L&T MF portfilios");
 		} catch (EncryptedDocumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -50,7 +50,7 @@ public class MiraeMFPortfolioInitializer implements PortfolioInitializer {
 	}
 
 	private List<MutualFundPortfolio> getDataFromFile() throws IOException, EncryptedDocumentException, InvalidFormatException {
-		String folder = Thread.currentThread().getContextClassLoader().getResource("resources/Mirae/").getFile();
+		String folder = Thread.currentThread().getContextClassLoader().getResource("resources/LandT/").getFile();
 		File[] files = new File(folder).listFiles();
 		Workbook wb = null;
 
@@ -58,18 +58,27 @@ public class MiraeMFPortfolioInitializer implements PortfolioInitializer {
 		for (File file : files) {
 			try {
 				wb = WorkbookFactory.create(file);
+				int extraIndex = file.getName().endsWith("Debt.xls") ? 1 : 0;
 
 				int count = wb.getNumberOfSheets();
 				// igonre 1st workbook and read from second
 				int index = 0;
 				while(index < count) {
 					Sheet sheet = wb.getSheetAt(index);
+					String sheetName = sheet.getSheetName();
 
 					// identify fund name
-					String fundName = sheet.getRow(0).getCell(1).getStringCellValue();
+					String fundName = "";
+					if (null != sheet.getRow(1).getCell(0)) {
+						fundName = sheet.getRow(1).getCell(0).getStringCellValue();
+					}
+					if (fundName.isEmpty()) {
+						fundName = sheet.getRow(1).getCell(1).getStringCellValue();
+					}
+					fundName = fundName.substring(fundName.indexOf(":") + 1, fundName.indexOf('(')).trim();
 
 					Date portfolioDate = getPortfolioDate(sheet);
-					System.out.println(sheet.getSheetName() + " -> " + fundName + ", date: " + portfolioDate);
+					System.out.println(sheetName + " -> " + fundName + ", date: " + portfolioDate);
 
 					MutualFundPortfolio fundPortfolio = new MutualFundPortfolio();
 					fundPortfolio.setName(fundName);
@@ -81,8 +90,8 @@ public class MiraeMFPortfolioInitializer implements PortfolioInitializer {
 					Iterator<Row> rowIterator = sheet.iterator();
 					while(rowIterator.hasNext()) {
 						Row row = rowIterator.next();
-						Cell nameCell = row.getCell(1);
-						if (null == nameCell) {
+						Cell nameCell = row.getCell(0 + extraIndex);
+						if (null == nameCell || nameCell.getCellTypeEnum() != CellType.STRING) {
 							continue;
 						}
 						String name = nameCell.getStringCellValue();
@@ -90,20 +99,20 @@ public class MiraeMFPortfolioInitializer implements PortfolioInitializer {
 							continue;
 						}
 
-						Cell percentCell = row.getCell(6);
+						Cell percentCell = row.getCell(4 + extraIndex);
 						if (null == percentCell || percentCell.getCellTypeEnum() == CellType.BLANK || percentCell.getCellTypeEnum() == CellType.STRING) {
 							continue;
 						}
 						float percent = 0;
 						if (null != percentCell) {
-							percent = (float)percentCell.getNumericCellValue() * 100;
+							percent = (float)percentCell.getNumericCellValue();
 						}
 
 						if (percent == 0.0) {
 							continue;
 						}
 
-						Cell isinCell = row.getCell(2);
+						Cell isinCell = row.getCell(5 + extraIndex);
 						String isin = null == isinCell ? "" : isinCell.getStringCellValue();
 						if (isin.isEmpty()) {
 							continue;
@@ -122,6 +131,9 @@ public class MiraeMFPortfolioInitializer implements PortfolioInitializer {
 					index++;
 				}
 			} finally {
+//				if (null != fs) {
+//					fs.close();
+//				}
 				if (null != wb) {
 					wb.close();
 				}
@@ -137,15 +149,21 @@ public class MiraeMFPortfolioInitializer implements PortfolioInitializer {
 		Date portfolioDate = null;
 		while(rows.hasNext()) {
 			Row row = rows.next();
-			Cell dateCell = row.getCell(1);
+			Cell dateCell = row.getCell(0);
 			if (null == dateCell || dateCell.getCellTypeEnum() != CellType.STRING) {
-				continue;
+				dateCell = row.getCell(1);
+				if (null == dateCell || !(dateCell.getCellTypeEnum() == CellType.STRING || dateCell.getCellTypeEnum() == CellType.FORMULA)) {
+					continue;
+				}
 			}
 			String dateStr = dateCell.getStringCellValue();
-			if (dateStr.startsWith("Monthly Portfolio Statement")) {
-				dateStr = dateStr.replace("Monthly Portfolio Statement as on", "").trim();
+			if (dateStr.startsWith("Portfolio as on")) {
+				dateStr = dateStr.replace("Portfolio as on", "").trim();
 			}
-			DateFormat formatter = new SimpleDateFormat("MMM dd,yyyy");
+			if (dateStr.startsWith("Portfolio Statement as on")) {
+				dateStr = dateStr.replace("Portfolio Statement as on", "").trim();
+			}
+			DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
 			try {
 				portfolioDate = (Date)formatter.parse(dateStr);
 				break;
@@ -157,6 +175,6 @@ public class MiraeMFPortfolioInitializer implements PortfolioInitializer {
 	}
 
 	public static void main(String[] args) {
-		new MiraeMFPortfolioInitializer().initialize();
+		new LandTMFPortfolioInitializer().initialize();
 	}
 }

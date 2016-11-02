@@ -11,12 +11,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.free.dao.funds.MutualFundPortfolioCRUD;
 import com.free.interfaces.funds.portfolio.PortfolioInitializer;
@@ -48,14 +48,12 @@ public class FTMFPortfolioInitializer implements PortfolioInitializer {
 	private List<MutualFundPortfolio> getDataFromFile() throws IOException, InvalidFormatException {
 		String folder = Thread.currentThread().getContextClassLoader().getResource("resources/FT/").getFile();
 		File[] files = new File(folder).listFiles();
-		OPCPackage pkg = null;
-		XSSFWorkbook wb = null;
+		Workbook wb = null;
 
 		List<MutualFundPortfolio> funds = new ArrayList<>();
 		for (File file : files) {
 			try {
-				pkg = OPCPackage.open(file);
-				wb = new XSSFWorkbook(pkg);
+				wb = WorkbookFactory.create(file);
 
 				int count = wb.getNumberOfSheets();
 				// igonre 1st workbook and read from second
