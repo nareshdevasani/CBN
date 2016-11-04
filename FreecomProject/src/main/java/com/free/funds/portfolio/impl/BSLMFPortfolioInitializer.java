@@ -1,15 +1,14 @@
 package com.free.funds.portfolio.impl;
 
-public class ICICIMFPortfolioInitializer extends BaseMFPortfolioInitializer {
-
+public class BSLMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 	@Override
 	public String getMFName() {
-		return "ICICI";
+		return "BSL";
 	}
 
 	@Override
 	public int getFundNameRowNumber() {
-		return 1;
+		return 0;
 	}
 
 	@Override
@@ -24,7 +23,7 @@ public class ICICIMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public int getInstrumentPercentCellNumber() {
-		return 7;
+		return 6;
 	}
 
 	@Override
@@ -39,7 +38,7 @@ public class ICICIMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public String getPortfolioDatePrefix() {
-		return "Portfolio as on";
+		return "Monthly Portfolio Statement as on";
 	}
 
 	@Override
@@ -48,6 +47,7 @@ public class ICICIMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 	}
 
 	public static void main(String[] args) {
-		new ICICIMFPortfolioInitializer().initialize();
+		new BSLMFPortfolioInitializer().initialize();
 	}
+
 }
