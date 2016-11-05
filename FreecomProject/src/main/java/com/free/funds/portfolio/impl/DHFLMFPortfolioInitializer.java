@@ -24,26 +24,55 @@ import com.free.interfaces.funds.portfolio.PortfolioInitializer;
 import com.free.pojos.funds.InstrumentAllocation;
 import com.free.pojos.funds.MutualFundPortfolio;
 
-public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer {
+public class DHFLMFPortfolioInitializer implements PortfolioInitializer {
 
-	public abstract String getMFName();
-	public abstract int getFundNameRowNumber();
-	public abstract int getFundNameCellNumber();
+	private int isinCellNum = 2;
+	private int instNameCellNum = 1;
+	private int percentMultiplier = 100;
+	private int dateCellNum = 1;
+	private int fundNameCellNum = 1;
+	private String datePrefix = "Monthly Portfolio Statement as on";
 
-	// instrument details extraction
-	public abstract int getInstrumentNameCellNumber();
-	public abstract int getInstrumentPercentCellNumber();
-	public abstract int getInstrumentIsinCellNumber();
-	public abstract int getInstrumentPercentMultiplier();
+	public String getMFName() {
+		return "DHFL_pramerica";
+	}
 
-	// date extraction
-	public abstract String getPortfolioDatePrefix();
-	public abstract String getPortfolioDateFormat();
+	public int getFundNameRowNumber() {
+		return 0;
+	}
+
+	public int getFundNameCellNumber() {
+		return fundNameCellNum;
+	}
+
+	public int getInstrumentNameCellNumber() {
+		return instNameCellNum;
+	}
+
+	public int getInstrumentPercentCellNumber() {
+		return 6;
+	}
+
+	public int getInstrumentIsinCellNumber() {
+		return isinCellNum;
+	}
+
+	public int getInstrumentPercentMultiplier() {
+		return percentMultiplier;
+	}
+
+	public String getPortfolioDatePrefix() {
+		return datePrefix;
+	}
+
+	public String getPortfolioDateFormat() {
+		return "MMM dd,yyyy";
+	}
 
 	public int getPortfolioDateCellNumber() {
-		return 1;
+		return dateCellNum;
 	}
-	
+
 	public int getSheetStartIndex() {
 		return 0;
 	}
@@ -96,6 +125,14 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 					Sheet sheet = wb.getSheetAt(index);
 					String sheetName = sheet.getSheetName();
 
+					if ("PDBF".equals(sheetName)) {
+						isinCellNum = 1;
+						instNameCellNum = 2;
+						percentMultiplier = 1;
+						dateCellNum = 2;
+						datePrefix = "Portfolio as on";
+						fundNameCellNum = 2;
+					}
 					// identify fund name
 					Row fundNameRow = sheet.getRow(getFundNameRowNumber());
 					if (null == fundNameRow || "NAV Details".equals(sheetName)) { // NAV Details added for Kotak
@@ -198,5 +235,9 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 			}
 		}
 		return portfolioDate;
+	}
+
+	public static void main(String[] args) {
+		new DHFLMFPortfolioInitializer().initialize();
 	}
 }

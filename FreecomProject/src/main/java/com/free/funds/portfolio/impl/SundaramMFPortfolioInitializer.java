@@ -24,24 +24,54 @@ import com.free.interfaces.funds.portfolio.PortfolioInitializer;
 import com.free.pojos.funds.InstrumentAllocation;
 import com.free.pojos.funds.MutualFundPortfolio;
 
-public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer {
+public class SundaramMFPortfolioInitializer implements PortfolioInitializer {
 
-	public abstract String getMFName();
-	public abstract int getFundNameRowNumber();
-	public abstract int getFundNameCellNumber();
+	private int fundNameRowNum = 1;
+	private int fundNameCellNum = 0;
+	private int percentCellNum = 6;
+	private String datePrefix = "Monthly Portfolio Statement for the month ended";
+	private String dateFormat = "dd MMM yyyy";
+	private int dateCellNum = 0;
+	private int instNameCellNum = 2;
+	private int instIsinCellNum = 1;
+	public String getMFName() {
+		return "Sundaram";
+	}
 
-	// instrument details extraction
-	public abstract int getInstrumentNameCellNumber();
-	public abstract int getInstrumentPercentCellNumber();
-	public abstract int getInstrumentIsinCellNumber();
-	public abstract int getInstrumentPercentMultiplier();
+	public int getFundNameRowNumber() {
+		return fundNameRowNum;
+	}
 
-	// date extraction
-	public abstract String getPortfolioDatePrefix();
-	public abstract String getPortfolioDateFormat();
+	public int getFundNameCellNumber() {
+		return fundNameCellNum;
+	}
+
+	public int getInstrumentNameCellNumber() {
+		return instNameCellNum;
+	}
+
+	public int getInstrumentPercentCellNumber() {
+		return percentCellNum;
+	}
+
+	public int getInstrumentIsinCellNumber() {
+		return instIsinCellNum;
+	}
+
+	public int getInstrumentPercentMultiplier() {
+		return 100;
+	}
+
+	public String getPortfolioDatePrefix() {
+		return datePrefix;
+	}
+
+	public String getPortfolioDateFormat() {
+		return dateFormat;
+	}
 
 	public int getPortfolioDateCellNumber() {
-		return 1;
+		return dateCellNum;
 	}
 	
 	public int getSheetStartIndex() {
@@ -87,6 +117,14 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 
 		List<MutualFundPortfolio> funds = new ArrayList<>();
 		for (File file : files) {
+			fundNameRowNum = 1;
+			fundNameCellNum = 0;
+			percentCellNum = 6;
+			datePrefix = "Monthly Portfolio Statement for the month ended";
+			dateFormat = "dd MMM yyyy";
+			dateCellNum = 0;
+			instNameCellNum = 2;
+			instIsinCellNum = 1;
 			try {
 				wb = WorkbookFactory.create(file);
 
@@ -95,6 +133,25 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 				while(index < count) {
 					Sheet sheet = wb.getSheetAt(index);
 					String sheetName = sheet.getSheetName();
+					if ("XDO_METADATA".equals(sheetName)) {
+						index++;
+						continue;
+					}
+					if ("global".equals(sheetName)) {
+						fundNameRowNum = 0;
+						percentCellNum = 5;
+						datePrefix = "Portfolio Statement for the month ended";
+					}
+					if ("WBF 1".equals(sheetName) || "WBF 2".equals(sheetName) || "WBF 3".equals(sheetName)) {
+						fundNameRowNum = 0;
+						fundNameCellNum = 1;
+						datePrefix = "Monthly Portfolio Statement as on";
+						dateFormat = "MMM dd, yyyy";
+						dateCellNum = 1;
+						percentCellNum = 6;
+						instNameCellNum = 1;
+						instIsinCellNum = 2;
+					}
 
 					// identify fund name
 					Row fundNameRow = sheet.getRow(getFundNameRowNumber());
@@ -188,6 +245,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 			String dateStr = dateCell.getStringCellValue();
 			if (dateStr.startsWith(prefix)) {
 				dateStr = dateStr.replace(prefix, "").trim();
+				dateStr = dateStr.replace("th", "");
 			}
 			DateFormat formatter = new SimpleDateFormat(dateFormat);
 			try {
@@ -198,5 +256,9 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 			}
 		}
 		return portfolioDate;
+	}
+
+	public static void main(String[] args) {
+		new SundaramMFPortfolioInitializer().initialize();
 	}
 }
