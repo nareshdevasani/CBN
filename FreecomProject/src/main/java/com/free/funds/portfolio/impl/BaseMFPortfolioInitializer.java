@@ -146,7 +146,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 						}
 
 						Cell isinCell = row.getCell(getInstrumentIsinCellNumber());
-						String isin = null == isinCell ? "" : isinCell.getStringCellValue();
+						String isin = null == isinCell ? "" : (isinCell.getCellTypeEnum() == CellType.STRING) ? isinCell.getStringCellValue() : "";
 						if (isin.isEmpty()) {
 							continue;
 						}
