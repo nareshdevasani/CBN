@@ -9,7 +9,9 @@ public class Instrument implements DataObject {
 		MF ("Mutual Fund"),
 		PREFERENCE_SHARES ("Preference Shares"),
 		DEBENTURES_BONDS ("Debentures and Bonds"),
-		EQUITY_INSTITUTIONAL ("Equity - Institutional Series");
+		EQUITY_INSTITUTIONAL ("Equity - Institutional Series"),
+		MONEY_MARKET ("Money Market"),
+		OTHER_DEBT ("Other Debt");
 
 		private String name;
 

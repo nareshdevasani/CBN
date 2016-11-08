@@ -19,8 +19,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import com.free.dao.funds.InstrumentCRUD;
 import com.free.dao.funds.MutualFundPortfolioCRUD;
 import com.free.interfaces.funds.portfolio.PortfolioInitializer;
+import com.free.pojos.funds.Instrument;
 import com.free.pojos.funds.InstrumentAllocation;
 import com.free.pojos.funds.MutualFundPortfolio;
 
@@ -61,6 +63,9 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 			int emptyInstCount = 0;
 			for (MutualFundPortfolio fund : folios) {
 				crud.modify(fund);
+
+				// validatePortfolio
+				validatePortfolio(fund);
 				if (fund.getPortfolio().isEmpty()) {
 					emptyInstCount++;
 				}
@@ -77,6 +82,17 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 		}
 
 		return false;
+	}
+
+	private void validatePortfolio(MutualFundPortfolio fund) {
+		InstrumentCRUD instCrud = new InstrumentCRUD();
+		for (InstrumentAllocation inst : fund.getPortfolio()) {
+			String isin = inst.getIsin();
+			Instrument instrument = instCrud.get(isin);
+			if (null == instrument) {
+				System.out.println(isin + " not found in MF - " + fund.getName());
+			}
+		}
 	}
 
 	private List<MutualFundPortfolio> getDataFromFile() throws IOException, EncryptedDocumentException, InvalidFormatException {
