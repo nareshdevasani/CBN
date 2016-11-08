@@ -29,6 +29,11 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		// 4. persist data
 		persistData(instruments);
 
+//		for (Instrument i : instruments) {
+//			System.out.println(i);
+//		}
+
+		System.out.println(instruments.size() + " Instruments are initialized successfully.");
 		return true;
 	}
 
@@ -43,7 +48,8 @@ public class InstrumentInitializer implements PortfolioInitializer {
 	private List<String> getDataFromFile() {
 		List<String> lines = new ArrayList<>();
 
-		URL instrumentsUrl = Thread.currentThread().getContextClassLoader().getResource("resources/EQUITY_L.csv");
+//		URL instrumentsUrl = Thread.currentThread().getContextClassLoader().getResource("resources/EQUITY_L.csv");
+		URL instrumentsUrl = Thread.currentThread().getContextClassLoader().getResource("resources/ListOfScrips.csv");
 		BufferedReader reader = null;
 	    try {
 			reader = new BufferedReader(new FileReader(instrumentsUrl.getFile()));
@@ -76,12 +82,31 @@ public class InstrumentInitializer implements PortfolioInitializer {
 			String line = lines.get(i);
 			String[] details = line.split(",");
 
+			// only add active instruments
+			if (!"Active".equalsIgnoreCase(details[3]) 
+					|| details.length < 7 
+					|| details[6].isEmpty()
+					|| "NA".equals(details[6])) {
+				continue;
+			}
+
 			Instrument instrument = new Instrument();
-			instrument.setSymbol(details[0]);
-			instrument.setName(details[1]);
-			instrument.setSeries(details[2]);
-			instrument.setListingDate(details[3]);
+			try {
+				instrument.setSecurityCode(Integer.parseInt(details[0]));
+			} catch (NumberFormatException nfe) {
+				System.out.println("Security code cannot be converted into integer.");
+			}
+
+			instrument.setSymbol(details[1]);
+
+			String name = details[2];
+			name = name.replace("&amp;", "&").replace("-$", "");
+			instrument.setName(name);
 			instrument.setIsin(details[6]);
+			String sector = details[7];
+			sector = sector.replace("&amp;", "&");
+			instrument.setSector(sector);
+			instrument.setSegment(Instrument.Segment.findByName(details[8]));
 
 			instruments.add(instrument);
 		}

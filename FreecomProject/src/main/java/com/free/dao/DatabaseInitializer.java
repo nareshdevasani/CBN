@@ -20,10 +20,12 @@ public final class DatabaseInitializer implements DatabaseConstants {
 		queries.add("create table if not exists freecom." + INSTRUMENT_TABLE + " ("
 				+ " name text, "
 				+ " symbol text, "
-				+ " series text, "
 				+ " sector text, "
-				+ " listingDate text, "
-				+ " isin text PRIMARY KEY"
+				+ " segment text, "
+				+ " isin text PRIMARY KEY, "
+				+ " securitycode int, "
+				+ " listingdate text, "
+				+ " marketcap float"
 				+ " ) ");
 
 
