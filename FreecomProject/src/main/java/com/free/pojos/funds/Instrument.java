@@ -6,7 +6,7 @@ public class Instrument implements DataObject {
 
 	public enum Segment {
 		EQUITY ("Equity"),
-		MF ("Mutual Fund"),
+		MF ("MF"),
 		PREFERENCE_SHARES ("Preference Shares"),
 		DEBENTURES_BONDS ("Debentures and Bonds"),
 		EQUITY_INSTITUTIONAL ("Equity - Institutional Series"),
@@ -30,6 +30,10 @@ public class Instrument implements DataObject {
 				}
 			}
 			return null;
+		}
+
+		public boolean isDebenturesAndBonds() {
+			return this == DEBENTURES_BONDS;
 		}
 	}
 

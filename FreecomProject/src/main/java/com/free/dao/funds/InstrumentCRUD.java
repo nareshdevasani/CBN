@@ -39,6 +39,8 @@ public class InstrumentCRUD implements CRUD<Instrument> {
 		ResultSet rs = CassandraWrapper.getResultSet(query, object.getIsin());
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
+			System.out.println("NEW:" + object);
+			System.out.println("OLD:" + getInstrument(rows.get(0)));
 			delete(object.getIsin());
 		}
 
@@ -60,19 +62,22 @@ public class InstrumentCRUD implements CRUD<Instrument> {
 		ResultSet rs = CassandraWrapper.getResultSet(query, isin);
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
-			Row r = rows.get(0);
-			Instrument inst = new Instrument();
-			inst.setName(r.getString("name"));
-			inst.setSymbol(r.getString("symbol"));
-			inst.setSector(r.getString("sector"));
-			inst.setSegment(Instrument.Segment.valueOf(r.getString("segment")));
-			inst.setIsin(r.getString("isin"));
-			inst.setSecurityCode(r.getInt("securitycode"));
-			inst.setListingDate(r.getString("listingdate"));
-			inst.setMarketValue(r.getFloat("marketcap"));
-			return inst;
+			return getInstrument (rows.get(0));
 		}
 		return null;
+	}
+
+	private Instrument getInstrument(Row r) {
+		Instrument inst = new Instrument();
+		inst.setName(r.getString("name"));
+		inst.setSymbol(r.getString("symbol"));
+		inst.setSector(r.getString("sector"));
+		inst.setSegment(Instrument.Segment.valueOf(r.getString("segment")));
+		inst.setIsin(r.getString("isin"));
+		inst.setSecurityCode(r.getInt("securitycode"));
+		inst.setListingDate(r.getString("listingdate"));
+		inst.setMarketValue(r.getFloat("marketcap"));
+		return inst;
 	}
 
 }

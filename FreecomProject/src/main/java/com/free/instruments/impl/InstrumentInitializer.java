@@ -8,8 +8,11 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -34,13 +37,11 @@ public class InstrumentInitializer implements PortfolioInitializer {
 
 		// 2. fetch data
 		// now fetch from the local excel
-		List<String> lines = getDataFromFile();
-
+		List<String> lines = getDataFromFile("resources/ISIN/ListOfScrips.csv");
 		// 3. parse data
-		List<Instrument> instruments = parseData(lines);
-
+		Collection<Instrument> instruments = parseData(lines);
 		// 4. persist data
-//		persistData(instruments);
+		persistData(instruments);
 
 //		for (Instrument i : instruments) {
 //			System.out.println(i);
@@ -51,13 +52,13 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		// initialize commercial papers
 		instruments = getMoneyMarketData("CP", "Commercial Paper");
 		// 4. persist data
-//		persistData(instruments);
+		persistData(instruments);
 		System.out.println(instruments.size() + " Commercial Papers are initialized successfully.");
 
 		// initialize Certificate of Deposits
 		instruments = getMoneyMarketData("CD", "Certificate of Deposits");
 		// 4. persist data
-//		persistData(instruments);
+		persistData(instruments);
 		System.out.println(instruments.size() + " Certificate of Deposits are initialized successfully.");
 
 		instruments = getMoneyMarketData("debt", "Bonds or Debentures", Segment.OTHER_DEBT);
@@ -65,14 +66,29 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		persistData(instruments);
 		System.out.println(instruments.size() + " Bonds or Debentures are initialized successfully.");
 
+		instruments = getGSecData();
+		// 4. persist data
+		persistData(instruments);
+		System.out.println(instruments.size() + " Government Securities are initialized successfully.");
+
+		instruments = getTreasuryData();
+		// 4. persist data
+		persistData(instruments);
+		System.out.println(instruments.size() + " Treasury Bills are initialized successfully.");
+
+		instruments = getMutualFundData();
+		// 4. persist data
+		persistData(instruments);
+		System.out.println(instruments.size() + " Mutual Funds are initialized successfully.");
+
 		return true;
 	}
 
-	private void persistData(List<Instrument> instruments) {
+	private void persistData(Collection<Instrument> instruments) {
 		InstrumentCRUD instCrud = new InstrumentCRUD();
 		for (Instrument inst : instruments) {
 			instCrud.modify(inst);
-			System.out.println(inst.getName() + " - " + inst.getIsin());
+			//System.out.println(inst.getName() + " - " + inst.getIsin());
 		}
 	}
 
@@ -134,53 +150,152 @@ public class InstrumentInitializer implements PortfolioInitializer {
 	    return instruments;
 	}
 
-//	private List<Instrument> getCommercialPaperData() {
-//		List<Instrument> instruments = new ArrayList<>();
-//
-//		Workbook wb = null;
-//		try {
-//			URI instrumentsUri = Thread.currentThread().getContextClassLoader().getResource("resources/ISIN/CD/").toURI();
-//			File[] files = Paths.get(instrumentsUri).toFile().listFiles();
-//
-//			for (File file : files) {
-//				wb = WorkbookFactory.create(file);
-//				Sheet sheet = wb.getSheetAt(0);
-//	
-//				Iterator<Row> rowIterator = sheet.rowIterator();
-//				rowIterator.next(); // ignore first row
-//				Instrument inst = null;
-//				while(rowIterator.hasNext()) {
-//					Row row = rowIterator.next();
-//					inst = new Instrument();
-//					Cell nameCell = row.getCell(0);
-//					if (null == nameCell || nameCell.getCellTypeEnum() != CellType.STRING) {
-//						continue;
-//					}
-//					inst.setName(nameCell.getStringCellValue());
-//	
-//					Cell isinCell = row.getCell(1);
-//					if (null == isinCell || isinCell.getCellTypeEnum() != CellType.STRING) {
-//						continue;
-//					}
-//					inst.setIsin(isinCell.getStringCellValue());
-//					inst.setSector("Certificate of Deposit");
-//					inst.setSegment(Instrument.Segment.MONEY_MARKET);
-//	
-//					instruments.add(inst);
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//	    return instruments;
-//	}
+	private List<Instrument> getGSecData() {
+		List<Instrument> instruments = new ArrayList<>();
 
-	private List<String> getDataFromFile() {
+		Workbook wb = null;
+		try {
+			URI instrumentsUri = Thread.currentThread().getContextClassLoader().getResource("resources/ISIN/" + "GS").toURI();
+			File[] files = Paths.get(instrumentsUri).toFile().listFiles();
+
+			for (File file : files) {
+				wb = WorkbookFactory.create(file);
+				Sheet sheet = wb.getSheetAt(0);
+	
+				Iterator<Row> rowIterator = sheet.rowIterator();
+				Instrument inst = null;
+				while(rowIterator.hasNext()) {
+					Row row = rowIterator.next();
+					Cell isinCell = row.getCell(4);
+					if (null == isinCell || isinCell.getCellTypeEnum() != CellType.STRING) {
+						continue;
+					}
+
+					String isin = isinCell.getStringCellValue().trim();
+					if ("ISIN".equalsIgnoreCase(isin)) {
+						continue;
+					}
+					inst = new Instrument();
+					inst.setIsin(isin);
+					Cell nameCell = row.getCell(5);
+					if (null == nameCell || nameCell.getCellTypeEnum() != CellType.STRING) {
+						continue;
+					}
+					inst.setName(nameCell.getStringCellValue() + " - Government of India");
+
+					inst.setSector("Government Securities");
+					inst.setSegment(Instrument.Segment.OTHER_DEBT);
+	
+					instruments.add(inst);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	    return instruments;
+	}
+
+	private Collection<Instrument> getMutualFundData() {
+		Map<String, Instrument> instruments = new HashMap<>();
+
+		try {
+			URI instrumentsUri = Thread.currentThread().getContextClassLoader().getResource("resources/ISIN/MF").toURI();
+			File[] files = Paths.get(instrumentsUri).toFile().listFiles();
+
+			for (File file : files) {
+				List<String> lines = getDataFromFile("resources/ISIN/MF/" + file.getName());
+
+				Instrument inst = null;
+				for(int i = 1; i < lines.size(); i++) {
+					String[] cells = lines.get(i).split(",");
+					String isin = cells[4];
+					if (null == isin || isin.isEmpty()) {
+						continue;
+					}
+
+					inst = new Instrument();
+					inst.setIsin(isin);
+					String name = cells[2];
+					if (null == name || name.trim().isEmpty()) {
+						continue;
+					}
+					inst.setName(name.trim());
+					inst.setSymbol(cells[0]);
+
+					inst.setSector("Mutual Funds");
+					inst.setSegment(Instrument.Segment.MF);
+	
+					instruments.put(isin, inst);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	    return instruments.values();
+	}
+
+	private List<Instrument> getTreasuryData() {
+		List<Instrument> instruments = new ArrayList<>();
+
+		try {
+			URI instrumentsUri = Thread.currentThread().getContextClassLoader().getResource("resources/ISIN/TBills").toURI();
+			File[] files = Paths.get(instrumentsUri).toFile().listFiles();
+
+			List<String> lines = getDataFromFile("resources/ISIN/TBills/" + files[0].getName());
+			Instrument inst = null;
+			for (String line : lines) {
+					String[] cells = line.split(",");
+					if (cells.length < 17) {
+						continue;
+					}
+					String secType = cells[2];
+					String sector = "";
+					switch(secType) {
+					case "TB":
+						sector = "Treasury Bills";
+						break;
+					case "SG":
+						sector = "State Government Securities";
+						break;
+					case "GF":
+						sector = "Government Floating Loans";
+						break;
+					case "GS":
+					case "GI":
+						sector = "Government Securities";
+						break;
+					case "GZ":
+						sector = "Government Coupons";
+						break;
+					}
+
+					if (sector.isEmpty()) {
+						continue;
+					}
+
+					String isin = cells[16];
+					inst = new Instrument();
+					inst.setIsin(isin);
+					inst.setName(cells[3]);
+					inst.setSector(sector);
+					inst.setSegment(Instrument.Segment.OTHER_DEBT);
+	
+					instruments.add(inst);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	    return instruments;
+	}
+
+	private List<String> getDataFromFile(String fileName) {
 		List<String> lines = new ArrayList<>();
 
 //		URL instrumentsUrl = Thread.currentThread().getContextClassLoader().getResource("resources/EQUITY_L.csv");
-		URL instrumentsUrl = Thread.currentThread().getContextClassLoader().getResource("resources/ISIN/ListOfScrips.csv");
+		URL instrumentsUrl = Thread.currentThread().getContextClassLoader().getResource(fileName);
 		BufferedReader reader = null;
 	    try {
 			reader = new BufferedReader(new FileReader(instrumentsUrl.getFile()));
@@ -215,11 +330,13 @@ public class InstrumentInitializer implements PortfolioInitializer {
 
 			// only add active instruments
 			if (!"Active".equalsIgnoreCase(details[3]) 
-					|| details.length < 7 
+					|| details.length < 9 
 					|| details[6].isEmpty()
-					|| "NA".equals(details[6])) {
+					|| "NA".equals(details[6].trim())) {
 				continue;
 			}
+
+			Segment segment = Instrument.Segment.findByName(details[8]);
 
 			Instrument instrument = new Instrument();
 			try {
@@ -237,7 +354,7 @@ public class InstrumentInitializer implements PortfolioInitializer {
 			String sector = details[7];
 			sector = sector.replace("&amp;", "&");
 			instrument.setSector(sector);
-			instrument.setSegment(Instrument.Segment.findByName(details[8]));
+			instrument.setSegment(segment);
 
 			instruments.add(instrument);
 		}
