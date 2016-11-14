@@ -1,17 +1,32 @@
 package com.free.funds.portfolio.impl;
 
-public class KotakMFPortfolioInitializer extends BaseMFPortfolioInitializer {
+public class EscortsMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
-	private String fundName = "";
+	private int fundNameCellNum = 2;
+	private int percentCellNum = 7;
 
 	@Override
 	public String getMFName() {
-		return "Kotak";
+		return "Escorts";
 	}
 
 	@Override
 	public boolean initializeSheet(String sheetName) {
-		return !"NAV Details".equals(sheetName);
+		switch(sheetName) {
+		case "ESDF":
+		case "EGILT":
+			percentCellNum = 6;
+			break;
+		case "ELP":
+			fundNameCellNum = 0;
+			percentCellNum = 6;
+			break;
+		default:
+			percentCellNum = 7;
+			fundNameCellNum = 2;
+			break;
+		}
+		return true;
 	}
 
 	@Override
@@ -21,7 +36,7 @@ public class KotakMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public int getFundNameCellNumber() {
-		return 2;
+		return fundNameCellNum;
 	}
 
 	@Override
@@ -31,12 +46,12 @@ public class KotakMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public int getInstrumentPercentCellNumber() {
-		return 7;
+		return percentCellNum;
 	}
 
 	@Override
 	public int getInstrumentIsinCellNumber() {
-		return 3;
+		return 1;
 	}
 
 	@Override
@@ -51,28 +66,15 @@ public class KotakMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public String getPortfolioDatePrefix() {
-		return "Portfolio of " + fundName + " as on";
+		return "MONTHLY PORTFOLIO STATEMENT AS ON";
 	}
 
 	@Override
 	public String getPortfolioDateFormat() {
-		return "dd-MMM-yyyy";
-	}
-
-	@Override
-	public String normalizeFundName(String name) {
-		int end = name.indexOf("as on");
-		int start = "Portfolio of ".length();
-		if(end >= 0) {
-			fundName = name.substring(start, end).trim();
-		} else {
-			fundName = name;
-		}
-
-		return fundName;
+		return "dd-MM-yyyy";
 	}
 
 	public static void main(String[] args) {
-		new KotakMFPortfolioInitializer().initialize();
+		new EscortsMFPortfolioInitializer().initialize();
 	}
 }

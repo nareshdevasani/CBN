@@ -29,6 +29,10 @@ import com.free.pojos.funds.MutualFundPortfolio;
 public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer {
 
 	public abstract String getMFName();
+	// true to continue; false to continue to next sheet
+	public boolean initializeSheet(String sheetName) {
+		return true;
+	}
 	public abstract int getFundNameRowNumber();
 	public abstract int getFundNameCellNumber();
 
@@ -111,16 +115,21 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 				while(index < count) {
 					Sheet sheet = wb.getSheetAt(index);
 					String sheetName = sheet.getSheetName();
+					boolean parseSheet = initializeSheet(sheetName);
+					if (!parseSheet) {
+						index++;
+						continue;
+					}
 
 					// identify fund name
 					Row fundNameRow = sheet.getRow(getFundNameRowNumber());
-					if (null == fundNameRow || "NAV Details".equals(sheetName)) { // NAV Details added for Kotak
+					if (null == fundNameRow) {
 						index++;
 						continue;
 					}
 					String fundName = fundNameRow.getCell(getFundNameCellNumber())
 							.getStringCellValue();
-					fundName = normalizeFundName(fundName);
+					fundName = normalizeFundName(fundName).trim();
 
 					Date portfolioDate = getPortfolioDate(sheet);
 					System.out.println(sheetName + " -> " + fundName + ", date: " + portfolioDate);
@@ -167,6 +176,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 							continue;
 						}
 
+						isin = isin.trim();
 						System.out.println("name: " + name + ", isin: " + isin + ", percent: " + percent);
 						InstrumentAllocation alloc = new InstrumentAllocation();
 						alloc.setIsin(isin);

@@ -76,10 +76,15 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		persistData(instruments);
 		System.out.println(instruments.size() + " Treasury Bills are initialized successfully.");
 
-		instruments = getMutualFundData();
+		instruments = getMutualFundData("MF", 0, 2, 4);
 		// 4. persist data
 		persistData(instruments);
 		System.out.println(instruments.size() + " Mutual Funds are initialized successfully.");
+
+		instruments = getMutualFundData("MF-ETF", 0, 2, 5);
+		// 4. persist data
+		persistData(instruments);
+		System.out.println(instruments.size() + " Mutual Fund ETFs are initialized successfully.");
 
 		return true;
 	}
@@ -196,32 +201,32 @@ public class InstrumentInitializer implements PortfolioInitializer {
 	    return instruments;
 	}
 
-	private Collection<Instrument> getMutualFundData() {
+	private Collection<Instrument> getMutualFundData(String folder, int symbolIndex, int nameIndex, int isinIndex) {
 		Map<String, Instrument> instruments = new HashMap<>();
 
 		try {
-			URI instrumentsUri = Thread.currentThread().getContextClassLoader().getResource("resources/ISIN/MF").toURI();
+			URI instrumentsUri = Thread.currentThread().getContextClassLoader().getResource("resources/ISIN/" + folder).toURI();
 			File[] files = Paths.get(instrumentsUri).toFile().listFiles();
 
 			for (File file : files) {
-				List<String> lines = getDataFromFile("resources/ISIN/MF/" + file.getName());
+				List<String> lines = getDataFromFile("resources/ISIN/" + folder + "/"+ file.getName());
 
 				Instrument inst = null;
 				for(int i = 1; i < lines.size(); i++) {
 					String[] cells = lines.get(i).split(",");
-					String isin = cells[4];
+					String isin = cells[isinIndex];
 					if (null == isin || isin.isEmpty()) {
 						continue;
 					}
 
 					inst = new Instrument();
 					inst.setIsin(isin);
-					String name = cells[2];
+					String name = cells[nameIndex];
 					if (null == name || name.trim().isEmpty()) {
 						continue;
 					}
 					inst.setName(name.trim());
-					inst.setSymbol(cells[0]);
+					inst.setSymbol(cells[symbolIndex]);
 
 					inst.setSector("Mutual Funds");
 					inst.setSegment(Instrument.Segment.MF);

@@ -34,7 +34,7 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 				+ ")";
 
 		CassandraWrapper.executeQuery(query);
-		
+
 		return object;
 	}
 
@@ -46,6 +46,8 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 		ResultSet rs = CassandraWrapper.getResultSet(query, object.getName());
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
+//			System.out.println("NEW:" + object);
+//			System.out.println("OLD:" + getMutualFundPortfolio(rows.get(0)));
 			delete(object.getName());
 		}
 
@@ -71,6 +73,10 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 		}
 
 		Row r = rows.get(0);
+		return getMutualFundPortfolio(r);
+	}
+
+	private MutualFundPortfolio getMutualFundPortfolio(Row r) {
 		MutualFundPortfolio mfPortfolio = new MutualFundPortfolio();
 		mfPortfolio.setName(r.getString("name"));
 		mfPortfolio.setDate(r.getTimestamp("portfolioDate"));
@@ -85,5 +91,4 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 
 		return mfPortfolio;
 	}
-
 }

@@ -1,42 +1,45 @@
 package com.free.funds.portfolio.impl;
 
-public class KotakMFPortfolioInitializer extends BaseMFPortfolioInitializer {
-
-	private String fundName = "";
+public class IDBIMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public String getMFName() {
-		return "Kotak";
+		return "IDBI";
 	}
 
 	@Override
-	public boolean initializeSheet(String sheetName) {
-		return !"NAV Details".equals(sheetName);
-	}
-
-	@Override
-	public int getFundNameRowNumber() {
+	public int getPortfolioDateCellNumber() {
 		return 0;
 	}
 
 	@Override
+	public int getSheetStartIndex() {
+		return 1;
+	}
+
+	@Override
+	public int getFundNameRowNumber() {
+		return 3;
+	}
+
+	@Override
 	public int getFundNameCellNumber() {
-		return 2;
+		return 0;
 	}
 
 	@Override
 	public int getInstrumentNameCellNumber() {
-		return 2;
+		return 0;
 	}
 
 	@Override
 	public int getInstrumentPercentCellNumber() {
-		return 7;
+		return 6;
 	}
 
 	@Override
 	public int getInstrumentIsinCellNumber() {
-		return 3;
+		return 1;
 	}
 
 	@Override
@@ -45,34 +48,21 @@ public class KotakMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 	}
 
 	@Override
-	public int getPortfolioDateCellNumber() {
-		return 2;
-	}
-
-	@Override
 	public String getPortfolioDatePrefix() {
-		return "Portfolio of " + fundName + " as on";
+		return "Portfolio Statement as on";
 	}
 
 	@Override
 	public String getPortfolioDateFormat() {
-		return "dd-MMM-yyyy";
+		return "MMM dd, yyyy";
 	}
 
 	@Override
 	public String normalizeFundName(String name) {
-		int end = name.indexOf("as on");
-		int start = "Portfolio of ".length();
-		if(end >= 0) {
-			fundName = name.substring(start, end).trim();
-		} else {
-			fundName = name;
-		}
-
-		return fundName;
+		return name.substring("Scheme :".length());
 	}
 
 	public static void main(String[] args) {
-		new KotakMFPortfolioInitializer().initialize();
+		new IDBIMFPortfolioInitializer().initialize();
 	}
 }
