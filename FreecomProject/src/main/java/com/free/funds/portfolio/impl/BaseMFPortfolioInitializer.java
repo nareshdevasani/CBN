@@ -30,7 +30,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 
 	public abstract String getMFName();
 	// true to continue; false to continue to next sheet
-	public boolean initializeSheet(String sheetName) {
+	public boolean initializeSheet(String sheetName, int index) {
 		return true;
 	}
 	public abstract int getFundNameRowNumber();
@@ -72,6 +72,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 				validatePortfolio(fund);
 				if (fund.getPortfolio().isEmpty()) {
 					emptyInstCount++;
+					System.out.println("Empty: " + fund.getName());
 				}
 			}
 			System.out.println("All " + folios.size() + " " + getMFName() +  " funds are initialized. Empty Funds: " + emptyInstCount);
@@ -115,7 +116,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 				while(index < count) {
 					Sheet sheet = wb.getSheetAt(index);
 					String sheetName = sheet.getSheetName();
-					boolean parseSheet = initializeSheet(sheetName);
+					boolean parseSheet = initializeSheet(sheetName, index);
 					if (!parseSheet) {
 						index++;
 						continue;
@@ -172,11 +173,11 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 
 						Cell isinCell = row.getCell(getInstrumentIsinCellNumber());
 						String isin = null == isinCell ? "" : (isinCell.getCellTypeEnum() == CellType.STRING) ? isinCell.getStringCellValue() : "";
+						isin = isin.trim();
 						if (isin.isEmpty()) {
 							continue;
 						}
 
-						isin = isin.trim();
 						System.out.println("name: " + name + ", isin: " + isin + ", percent: " + percent);
 						InstrumentAllocation alloc = new InstrumentAllocation();
 						alloc.setIsin(isin);

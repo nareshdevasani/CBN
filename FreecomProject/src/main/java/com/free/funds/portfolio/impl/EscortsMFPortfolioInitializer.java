@@ -11,7 +11,7 @@ public class EscortsMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 	}
 
 	@Override
-	public boolean initializeSheet(String sheetName) {
+	public boolean initializeSheet(String sheetName, int index) {
 		switch(sheetName) {
 		case "ESDF":
 		case "EGILT":
