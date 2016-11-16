@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -206,9 +207,16 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 		Date portfolioDate = null;
 		String prefix = getPortfolioDatePrefix();
 		String dateFormat = getPortfolioDateFormat();
+		int dateCellNum = getPortfolioDateCellNumber();
+		if (-1 == dateCellNum) {
+			Calendar calendar = Calendar.getInstance();
+			calendar.add(Calendar.MONTH, -1);
+			calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+			return calendar.getTime();
+		}
 		while(rows.hasNext()) {
 			Row row = rows.next();
-			Cell dateCell = row.getCell(getPortfolioDateCellNumber());
+			Cell dateCell = row.getCell(dateCellNum);
 			if (null == dateCell || dateCell.getCellTypeEnum() != CellType.STRING) {
 				continue;
 			}
