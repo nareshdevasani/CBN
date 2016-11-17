@@ -86,6 +86,11 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		persistData(instruments);
 		System.out.println(instruments.size() + " Mutual Fund ETFs are initialized successfully.");
 
+		instruments = getMutualFundData("MF-Close", 0, 1, 6);
+		// 4. persist data
+		persistData(instruments);
+		System.out.println(instruments.size() + " Close Ended Mutual Funds are initialized successfully.");
+
 		return true;
 	}
 
@@ -214,10 +219,26 @@ public class InstrumentInitializer implements PortfolioInitializer {
 				Instrument inst = null;
 				for(int i = 1; i < lines.size(); i++) {
 					String[] cells = lines.get(i).split(",");
-					String isin = cells[isinIndex];
-					if (null == isin || isin.isEmpty()) {
+					if (cells.length < isinIndex + 1) {
 						continue;
 					}
+					String isin = cells[isinIndex];
+					if (null == isin || isin.trim().isEmpty()) {
+						continue;
+					}
+
+					isin = isin.trim();
+					String nameSuffix = "";
+					// custom code for close ended file -- START
+					if (isin.equals("1")) {
+						isin = cells[isinIndex + 1];
+						if (null == isin || isin.trim().isEmpty()) {
+							continue;
+						}
+						isin = isin.trim();
+						nameSuffix = cells[nameIndex + 1].trim();
+					}
+					// custom code for close ended file -- END
 
 					inst = new Instrument();
 					inst.setIsin(isin);
@@ -225,7 +246,7 @@ public class InstrumentInitializer implements PortfolioInitializer {
 					if (null == name || name.trim().isEmpty()) {
 						continue;
 					}
-					inst.setName(name.trim());
+					inst.setName(name.trim() + (nameSuffix.isEmpty() ? "" : " " + nameSuffix));
 					inst.setSymbol(cells[symbolIndex]);
 
 					inst.setSector("Mutual Funds");

@@ -117,7 +117,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 				while(index < count) {
 					Sheet sheet = wb.getSheetAt(index);
 					String sheetName = sheet.getSheetName();
-					boolean parseSheet = initializeSheet(sheetName, index);
+					boolean parseSheet = initializeSheet(sheetName.trim(), index);
 					if (!parseSheet) {
 						index++;
 						continue;
@@ -129,8 +129,12 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 						index++;
 						continue;
 					}
-					String fundName = fundNameRow.getCell(getFundNameCellNumber())
-							.getStringCellValue();
+					Cell fundNameCell = fundNameRow.getCell(getFundNameCellNumber());
+					if (null == fundNameCell) {
+						index++;
+						continue;
+					}
+					String fundName = fundNameCell.getStringCellValue();
 					fundName = normalizeFundName(fundName).trim();
 
 					Date portfolioDate = getPortfolioDate(sheet);
@@ -221,6 +225,8 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 				continue;
 			}
 			String dateStr = dateCell.getStringCellValue();
+			// remove duplicate blank spaces
+			dateStr = dateStr.replaceAll("\\s+", " ");
 			if (dateStr.startsWith(prefix)) {
 				dateStr = dateStr.replace(prefix, "").trim();
 			}
