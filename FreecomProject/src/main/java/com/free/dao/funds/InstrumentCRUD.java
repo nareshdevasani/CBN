@@ -15,7 +15,7 @@ public class InstrumentCRUD implements CRUD<Instrument> {
 	public Instrument create(Instrument object) {
 		String query = "INSERT INTO "
 				+ DatabaseInitializer.INSTRUMENT_TABLE
-				+ " (name, symbol, sector, segment, isin, securitycode, listingdate, marketcap) VALUES ("
+				+ " (name, symbol, sector, segment, isin, securitycode, listingdate, marketcap, mcaptype) VALUES ("
 				+ "$$" + object.getName() + "$$,"
 				+ "$$" + object.getSymbol() + "$$,"
 				+ "$$" + object.getSector() + "$$,"
@@ -23,7 +23,8 @@ public class InstrumentCRUD implements CRUD<Instrument> {
 				+ "$$" + object.getIsin() + "$$,"
 				+ object.getSecurityCode() + ","
 				+ "$$" + object.getListingDate() + "$$,"
-				+ object.getMarketValue()
+				+ object.getMarketValue() + ","
+				+ "$$" + object.getMarketCap() + "$$"
 				+ ")";
 
 		CassandraWrapper.executeQuery(query);
@@ -33,7 +34,7 @@ public class InstrumentCRUD implements CRUD<Instrument> {
 
 	@Override
 	public Instrument modify(Instrument object) {
-		String query = "select name, symbol, sector, segment, isin, securitycode, listingdate, marketcap from "
+		String query = "select name, symbol, sector, segment, isin, securitycode, listingdate, marketcap, mcaptype from "
 				+ DatabaseInitializer.INSTRUMENT_TABLE
 				+ " where isin=?";
 		ResultSet rs = CassandraWrapper.getResultSet(query, object.getIsin());

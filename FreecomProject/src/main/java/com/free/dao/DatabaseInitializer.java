@@ -25,7 +25,8 @@ public final class DatabaseInitializer implements DatabaseConstants {
 				+ " isin text PRIMARY KEY, "
 				+ " securitycode int, "
 				+ " listingdate text, "
-				+ " marketcap float"
+				+ " marketcap float, "
+				+ " mcaptype text"
 				+ " ) ");
 
 

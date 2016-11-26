@@ -120,6 +120,7 @@ public class HDFCMFPortfolioInitializer implements PortfolioInitializer {
 						System.out.println("name: " + name + ", isin: " + isin + ", percent: " + percent);
 						InstrumentAllocation alloc = new InstrumentAllocation();
 						alloc.setIsin(isin);
+						alloc.setName(name);
 						alloc.setPercent(percent);
 
 						instruments.add(alloc);

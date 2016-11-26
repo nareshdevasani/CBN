@@ -24,12 +24,16 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import com.free.dao.funds.InstrumentCRUD;
 import com.free.interfaces.funds.portfolio.PortfolioInitializer;
 import com.free.pojos.funds.Instrument;
+import com.free.pojos.funds.Instrument.MCAP;
 import com.free.pojos.funds.Instrument.Segment;
 
 public class InstrumentInitializer implements PortfolioInitializer {
 
 	@Override
 	public boolean initialize() {
+		// get market cap lookup table
+		Map<Integer, Instrument.MCAP> mCapLookup = prepareMCapLookupTable();
+
 		// TODO Auto-generated method stub
 		// 1. create data provider
 		// download from (old url https://www.nseindia.com/content/equities/EQUITY_L.csv)
@@ -39,7 +43,7 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		// now fetch from the local excel
 		List<String> lines = getDataFromFile("resources/ISIN/ListOfScrips.csv");
 		// 3. parse data
-		Collection<Instrument> instruments = parseData(lines);
+		Collection<Instrument> instruments = parseData(lines, mCapLookup);
 		// 4. persist data
 		persistData(instruments);
 
@@ -92,6 +96,56 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		System.out.println(instruments.size() + " Close Ended Mutual Funds are initialized successfully.");
 
 		return true;
+	}
+
+	private Map<Integer, Instrument.MCAP> prepareMCapLookupTable() {
+		Map<Integer, Instrument.MCAP> lookup = new HashMap<Integer, Instrument.MCAP>();
+
+		Workbook wb = null;
+		try {
+			// http://www.bseindia.com/downloads1/Top_500_Companies_31032016.zip
+			URI instrumentsUri = Thread.currentThread().getContextClassLoader().getResource("resources/ISIN/MCap/bse").toURI();
+			File[] files = Paths.get(instrumentsUri).toFile().listFiles();
+
+			for (File file : files) {
+				wb = WorkbookFactory.create(file);
+				Sheet sheet = wb.getSheetAt(0);
+
+				Iterator<Row> rowIterator = sheet.rowIterator();
+				rowIterator.next();
+				rowIterator.next(); // leave two rows
+				while(rowIterator.hasNext()) {
+					Row row = rowIterator.next();
+					Cell indexCell = row.getCell(0);
+					if (null == indexCell || indexCell.getCellTypeEnum() != CellType.NUMERIC) {
+						continue;
+					}
+
+					int index = (int)indexCell.getNumericCellValue();
+	
+					Cell secCodeCell = row.getCell(1);
+					if (null == secCodeCell || secCodeCell.getCellTypeEnum() != CellType.NUMERIC) {
+						continue;
+					}
+
+					int secCode = (int)secCodeCell.getNumericCellValue();
+
+					if (index <= 20) {
+						lookup.put(secCode, MCAP.GAINT_CAP);
+					} else if (index > 20 && index <= 110) {
+						lookup.put(secCode, MCAP.LARGE_CAP);
+					} else if (index > 110 && index <= 305) {
+						lookup.put(secCode, MCAP.MID_CAP);
+					} else {
+						lookup.put(secCode, MCAP.SMALL_CAP);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return lookup;
 	}
 
 	private void persistData(Collection<Instrument> instruments) {
@@ -348,7 +402,7 @@ public class InstrumentInitializer implements PortfolioInitializer {
 	    return lines;
 	}
 
-	private List<Instrument> parseData(List<String> lines) {
+	private List<Instrument> parseData(List<String> lines, Map<Integer, Instrument.MCAP> mCapLookup) {
 		List<Instrument> instruments = new ArrayList<>();
 		for (int i = 1; i < lines.size(); i++) {
 			String line = lines.get(i);
@@ -366,7 +420,9 @@ public class InstrumentInitializer implements PortfolioInitializer {
 
 			Instrument instrument = new Instrument();
 			try {
-				instrument.setSecurityCode(Integer.parseInt(details[0]));
+				int secCode = Integer.parseInt(details[0]);
+				instrument.setSecurityCode(secCode);
+				instrument.setMarketCap(mCapLookup.get(secCode));
 			} catch (NumberFormatException nfe) {
 				System.out.println("Security code cannot be converted into integer.");
 			}

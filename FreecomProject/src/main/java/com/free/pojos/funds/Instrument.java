@@ -37,6 +37,27 @@ public class Instrument implements DataObject {
 		}
 	}
 
+	public enum MCAP {
+		// 1-lac crore and above
+		GAINT_CAP ("Mega Cap"),
+		// 20K crore and less than 1-lac crore
+		LARGE_CAP ("Large Cap"),
+		// between 5K crore and 20K crore
+		MID_CAP ("Mid Cap"),
+		// less than 5K crore
+		SMALL_CAP ("Small Cap"),
+		MICRO_CAP ("Micro Cap");
+		private String name;
+
+		MCAP(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+	}
+
 	public String getIsin() {
 		return isin;
 	}
@@ -101,6 +122,14 @@ public class Instrument implements DataObject {
 		this.marketValue = marketValue;
 	}
 
+	public MCAP getMarketCap() {
+		return marketCap;
+	}
+	
+	public void setMarketCap(MCAP marketCap) {
+		this.marketCap = marketCap;
+	}
+
 	@Override
 	public String toString() {
 		return new StringBuilder("ISIN: ").append(isin).append(", ")
@@ -109,6 +138,7 @@ public class Instrument implements DataObject {
 				.append("Sector: ").append(sector).append(", ")
 				.append("Segment: ").append(segment).append(", ")
 				.append("Security Code: ").append(securityCode).append(", ")
+				.append("Market-cap Type: ").append(marketCap.name()).append(", ")
 				.toString();
 	}
 
@@ -121,4 +151,5 @@ public class Instrument implements DataObject {
 	private String listingDate;
 	// in crores
 	private float marketValue;
+	private MCAP marketCap;
 }
