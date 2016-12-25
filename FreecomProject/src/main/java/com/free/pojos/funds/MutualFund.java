@@ -1,5 +1,7 @@
 package com.free.pojos.funds;
 
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import com.free.interfaces.dao.DataObject;
 
@@ -110,8 +112,45 @@ public class MutualFund implements DataObject {
 		this.schemeCode = schemeCode;
 	}
 
+	public String getFundCategory() {
+		return fundCategory;
+	}
+
+	public void setFundCategory(String fundCategory) {
+		this.fundCategory = fundCategory;
+	}
+
+	public Date getNavDate() {
+		return navDate;
+	}
+	
+	public void setNavDate(Date navDate) {
+		this.navDate = navDate;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder(); 
+		b.append(schemeCode).append(";")
+		.append(isin).append(";")
+		.append(isinReinvest).append(";")
+		.append(name).append(";")
+		.append(plan).append(";")
+		.append(options).append(";")
+		.append(fundType).append(";")
+		.append(fundCategory).append(";")
+		.append(fundHouse).append(";")
+		.append(nav).append(";")
+		.append(rePurchagePrice).append(";")
+		.append(salePrice).append(";")
+		.append(navDate);
+		return b.toString();
+	}
+
 	private String name;
+	// direct/regular
 	private String plan;
+	// dividend/growth
 	private String options;
 	private String schemeCode;
 	private String isin; // growth/Div-payout
@@ -119,11 +158,14 @@ public class MutualFund implements DataObject {
 
 	// open-ended/close-ended etc.
 	private String fundType;
+	// balanced/ELSS/floating-rate etc...
+	private String fundCategory;
 
 	private String fundHouse;
 	private String manager;
 	private float expense;
 	private float nav;
+	private Date navDate;
 	private float rePurchagePrice;
 	private float salePrice;
 }

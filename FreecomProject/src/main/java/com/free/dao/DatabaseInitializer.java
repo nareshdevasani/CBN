@@ -37,6 +37,25 @@ public final class DatabaseInitializer implements DatabaseConstants {
 				+ " instruments text "
 				+ " ) ");
 
+		// 3. Mutual fund header information
+		queries.add("create table if not exists freecom." + MUTUAL_FUND_TABLE + " ("
+				+ " name text, "
+				+ " plan text, "
+				+ " options text, "
+				+ " schemecode text, "
+				+ " isin text, "
+				+ " isinreinvest text, "
+				+ " fundtype text, "
+				+ " fundcategory text, "
+				+ " fundhouse text, "
+				+ " manager text, "
+				+ " expense float,"
+				+ " nav float,"
+				+ " repurchasingprice float,"
+				+ " saleprice float,"
+				+ " navdate timestamp, "
+				+ " PRIMARY KEY (name, plan, options)) ");
+
 		for (String query : queries) {
 			session.execute(query);
 		}
