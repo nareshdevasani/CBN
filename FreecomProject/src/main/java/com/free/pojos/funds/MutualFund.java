@@ -127,7 +127,7 @@ public class MutualFund implements DataObject {
 	public void setNavDate(Date navDate) {
 		this.navDate = navDate;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder(); 
@@ -158,7 +158,7 @@ public class MutualFund implements DataObject {
 
 	// open-ended/close-ended etc.
 	private String fundType;
-	// balanced/ELSS/floating-rate etc...
+	// balanced/ELSS/floating-rate/growth etc...
 	private String fundCategory;
 
 	private String fundHouse;

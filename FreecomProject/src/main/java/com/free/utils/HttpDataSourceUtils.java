@@ -1,6 +1,5 @@
 package com.free.utils;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +21,7 @@ import com.free.pojos.funds.MutualFund;
 
 public final class HttpDataSourceUtils {
 
-	public static List<MutualFund> readNAVFromURL() throws Exception {
+	public static List<MutualFund> readNAVFromURL() {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			HttpGet httpget = new HttpGet("http://portal.amfiindia.com/spages/NAV0.txt");
@@ -55,8 +54,14 @@ public final class HttpDataSourceUtils {
 			} finally {
 				response.close();
 			}
+		} catch (Exception e) {
+			System.out.println("Exception in getting nav details.");
 		} finally {
-			httpclient.close();
+			try {
+				httpclient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -104,12 +109,13 @@ public final class HttpDataSourceUtils {
 				fund.setNavDate(navDate);
 
 				setSchemeNameDetails(fund, details[3]);
+				funds.add(fund);
 				System.out.println(fund);
 			} else if (line.contains("Fund")) {
 				houseName = line;
 			} else if (line.contains("(")) {
 				type = line.substring(0, line.indexOf('('));
-				type = type.substring(0, type.length() - "scheles".length()).trim();
+				type = type.substring(0, type.length() - "schemes".length()).trim();
 				category = line.substring(line.indexOf('(') + 1, line.indexOf(')'));
 			}
 		}
@@ -132,9 +138,11 @@ public final class HttpDataSourceUtils {
 			fund.setOptions("Dividend Reinvestment");
 		} else if (sname.toLowerCase().contains("dividend payout")) {
 			fund.setOptions("Dividend Payout");
-		} else if (sname.toLowerCase().contains("growth")) {
+		} else if (sname.toLowerCase().contains("- growth") || sname.toLowerCase().contains("growth")) {
 			fund.setOptions("Growth");
-		} else if (sname.toLowerCase().contains("dividend") || sname.toLowerCase().contains("div option")) {
+		}
+		if (sname.toLowerCase().contains("- dividend") || sname.toLowerCase().contains("dividend")
+				|| sname.toLowerCase().contains("div option")) {
 			fund.setOptions("Dividend");
 		}
 
@@ -164,8 +172,20 @@ public final class HttpDataSourceUtils {
 		sname = sname.replace("dividend option", "");
 		sname = sname.replace("DIVIDEND OPTION", "");
 		sname = sname.replace("Dividend option", "");
-		sname = sname.replace("Dividend", "");
-		sname = sname.replace("Growth", "");
+		if (sname.contains("- Dividend Plan") || sname.contains("- Dividend")) {
+			sname = sname.replace("- Dividend Plan", "");
+			sname = sname.replace("- Dividend", "");
+		} else {
+			sname = sname.replace("Dividend", "");
+		}
+		if (sname.contains("- Growth Plan") || sname.contains("- Growth")) {
+			sname = sname.replace("- Growth Plan", "");
+			sname = sname.replace("- Growth", "");
+		} else if ("Growth".equals(fund.getOptions())) {
+			sname = sname.replace("Growth", "");
+		}
+		sname = sname.replace("DIVIDEND", "");
+		sname = sname.replace("GROWTH", "");
 		sname = sname.replaceAll("( )+", " ");
 		sname = sname.replaceAll("(-)+", "-");
 		sname = sname.replaceAll("(_)+", "_");

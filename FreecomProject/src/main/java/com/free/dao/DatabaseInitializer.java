@@ -54,7 +54,8 @@ public final class DatabaseInitializer implements DatabaseConstants {
 				+ " repurchasingprice float,"
 				+ " saleprice float,"
 				+ " navdate timestamp, "
-				+ " PRIMARY KEY (name, plan, options)) ");
+				+ " PRIMARY KEY (name, plan, options, schemecode)) ");
+		queries.add("CREATE INDEX  IF NOT EXISTS mutualfund_schemecode ON freecom." + MUTUAL_FUND_TABLE + " (schemecode);");
 
 		for (String query : queries) {
 			session.execute(query);
