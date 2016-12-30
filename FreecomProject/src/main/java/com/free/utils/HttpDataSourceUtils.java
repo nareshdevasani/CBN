@@ -9,7 +9,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -100,6 +103,7 @@ public final class HttpDataSourceUtils {
 				try {
 					navDate = (Date)formatter.parse(details[7]);
 				} catch (ParseException e) {
+					System.err.println("Failed to parse the date: " + details[7]);
 					navDate = new Date();
 				}
 
@@ -210,5 +214,102 @@ public final class HttpDataSourceUtils {
 
 	public static void main(String[] args) throws Exception {
 		readNAVFromURL();
+	}
+
+	public static Map<String, Map<Date, Float>> getNavHistoryForDateRange(int mf, int type, String from, String to) {
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		try {
+			String url = "http://portal.amfiindia.com/DownloadNAVHistoryReport_Po.aspx?mf=" + mf + "&tp=" + type
+					+ "&frmdt=" + from + "&todt=" + to;
+			HttpGet httpget = new HttpGet(url);
+
+			System.out.println("Executing request " + httpget.getRequestLine());
+			CloseableHttpResponse response = httpclient.execute(httpget);
+			try {
+				System.out.println("----------------------------------------");
+				System.out.println(response.getStatusLine());
+
+				// Get hold of the response entity
+				HttpEntity entity = response.getEntity();
+
+				// If the response does not enclose an entity, there is no need
+				// to bother about connection release
+				if (entity != null) {
+					InputStream instream = entity.getContent();
+					try {
+						Map<String, Map<Date, Float>> result = getSchemeToDateToNavMap(instream);
+						System.out.println("Number of entries from " + from + " to " + to + " are: " + result.size());
+						return result;
+						// do something useful with the response
+					} catch (IOException ex) {
+						// In case of an IOException the connection will be
+						// released back to the connection manager automatically
+						throw ex;
+					} finally {
+						// Closing the input stream will trigger connection release
+						instream.close();
+					}
+				}
+			} finally {
+				response.close();
+			}
+		} catch (Exception e) {
+			System.out.println("Exception in getting nav details.");
+		} finally {
+			try {
+				httpclient.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return null;
+	}
+
+	private static Map<String, Map<Date, Float>> getSchemeToDateToNavMap(InputStream instream) throws IOException {
+		Map<String, Map<Date, Float>> result = new HashMap<>();
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(instream));
+
+        // ignore first line.
+		String line = reader.readLine();
+		while((line = reader.readLine()) != null) {
+			line = line.trim();
+			if (line.isEmpty()) {
+				continue;
+			}
+
+			if (line.contains(";")) {
+				String[] details = line.split(";");
+				String scheme = details[0];
+				String date = details[5];
+
+				Date navDate = new Date();
+				DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+				try {
+					navDate = (Date)formatter.parse(date);
+				} catch (ParseException e) {
+					System.err.println("Failed to parse the date: " + date);
+				}
+
+				float nav = 0;
+				try {
+					nav = Float.parseFloat(details[2]);
+				} catch(NumberFormatException nfe) {
+					// continue
+					continue;
+				}
+
+				Map<Date, Float> dateToNav = result.get(scheme);
+				if (null == dateToNav) {
+					dateToNav = new TreeMap<>();
+					result.put(scheme, dateToNav);
+				}
+
+				dateToNav.put(navDate, nav);
+			}
+		}
+
+		return result;
 	}
 }
