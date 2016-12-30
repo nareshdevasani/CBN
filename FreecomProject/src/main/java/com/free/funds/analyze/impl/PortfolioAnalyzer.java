@@ -1,4 +1,4 @@
-package com.free.funds.amalyze.impl;
+package com.free.funds.analyze.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
