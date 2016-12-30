@@ -172,8 +172,13 @@ public final class HttpDataSourceUtils {
 		sname = sname.replace("dividend option", "");
 		sname = sname.replace("DIVIDEND OPTION", "");
 		sname = sname.replace("Dividend option", "");
-		if (sname.contains("- Dividend Plan") || sname.contains("- Dividend")) {
+		if (sname.contains("- Dividend Plan")
+				|| sname.contains("-Dividend Plan")
+				|| sname.contains("-DIVIDEND PLAN")
+				|| sname.contains("- Dividend")) {
 			sname = sname.replace("- Dividend Plan", "");
+			sname = sname.replace("-Dividend Plan", "");
+			sname = sname.replace("-DIVIDEND PLAN", "");
 			sname = sname.replace("- Dividend", "");
 		} else {
 			sname = sname.replace("Dividend", "");

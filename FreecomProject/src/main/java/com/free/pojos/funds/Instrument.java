@@ -138,7 +138,7 @@ public class Instrument implements DataObject {
 				.append("Sector: ").append(sector).append(", ")
 				.append("Segment: ").append(segment).append(", ")
 				.append("Security Code: ").append(securityCode).append(", ")
-				.append("Market-cap Type: ").append(marketCap.name()).append(", ")
+				.append("Market-cap Type: ").append(null == marketCap ? "" : marketCap.name()).append(", ")
 				.toString();
 	}
 

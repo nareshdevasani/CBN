@@ -32,7 +32,8 @@ public final class DatabaseInitializer implements DatabaseConstants {
 
 		// 2. Mutualfund portfolio table
 		queries.add("create table if not exists freecom." + MF_PORTFOLIO_TABLE + " ("
-				+ " name text PRIMARY KEY, "
+				+ " name text, "
+				+ " lname text PRIMARY KEY, "
 				+ " portfolioDate timestamp, "
 				+ " instruments text "
 				+ " ) ");
@@ -56,6 +57,13 @@ public final class DatabaseInitializer implements DatabaseConstants {
 				+ " navdate timestamp, "
 				+ " PRIMARY KEY (name, plan, options, schemecode)) ");
 		queries.add("CREATE INDEX  IF NOT EXISTS mutualfund_schemecode ON freecom." + MUTUAL_FUND_TABLE + " (schemecode);");
+
+		// 3. Mutualfund historical navs
+		queries.add("create table if not exists freecom." + FUND_NAV_HISTORY_TABLE + " ("
+				+ " schemecode text PRIMARY KEY, "
+				+ " navdate timestamp, "
+				+ " nav text "
+				+ " ) ");
 
 		for (String query : queries) {
 			session.execute(query);

@@ -1,6 +1,10 @@
 package com.free.dao.funds;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -91,14 +95,16 @@ public class FundCRUD implements CRUD<MutualFund> {
 
 	@Override
 	public MutualFund get(String schemecode) {
-		String query = "select name, plan, options, isin, isinreinvest, fundtype, fundcategory"
+		String query = "select name, plan, options, isin, isinreinvest, fundtype, fundcategory,"
 				+ " fundhouse, manager, expense, nav, repurchasingprice, saleprice, navdate from "
 				+ DatabaseInitializer.MUTUAL_FUND_TABLE
-				+ " where schemecode=?";
-		ResultSet rs = CassandraWrapper.getResultSet(query, schemecode);
+				+ " where schemecode=$$" + schemecode + "$$";
+		ResultSet rs = CassandraWrapper.getResultSet(query);
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
-			getMutualFundFromRow(rows.get(0));
+			MutualFund fund = getMutualFundFromRow(rows.get(0));
+			fund.setSchemeCode(schemecode);
+			return fund;
 		}
 		return null;
 	}
@@ -120,5 +126,19 @@ public class FundCRUD implements CRUD<MutualFund> {
 		fund.setSalePrice(r.getFloat("saleprice"));
 		fund.setNavDate(r.getTimestamp("navdate"));
 		return fund;
+	}
+
+	public Collection<String> getAllSchemeCodes() {
+		String query = "select schemecode from " + DatabaseInitializer.MUTUAL_FUND_TABLE;
+		ResultSet rs = CassandraWrapper.getResultSet(query);
+		List<Row> rows = rs.all();
+
+		Set<String> schemeCodes = new HashSet<>();
+		if (!rows.isEmpty()) {
+			for (Row row : rows) {
+				schemeCodes.add(row.getString(0));
+			}
+		}
+		return schemeCodes;
 	}
 }

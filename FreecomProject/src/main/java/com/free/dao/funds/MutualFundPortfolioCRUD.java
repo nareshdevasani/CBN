@@ -1,7 +1,9 @@
 package com.free.dao.funds;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -27,8 +29,9 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 		}
 		String query = "INSERT INTO "
 				+ DatabaseInitializer.MF_PORTFOLIO_TABLE
-				+ " (name, portfolioDate, instruments) VALUES ("
+				+ " (name, lname, portfolioDate, instruments) VALUES ("
 				+ "$$" + object.getName() + "$$,"
+				+ "$$" + object.getName().toLowerCase() + "$$,"
 				+ "$$" + object.getDate().getTime() + "$$,"
 				+ "$$" + instruments + "$$"
 				+ ")";
@@ -63,10 +66,10 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 
 	@Override
 	public MutualFundPortfolio get(String name) {
-		String query = "select name, portfolioDate, instruments from "
+		String query = "select name, lname, portfolioDate, instruments from "
 				+ DatabaseInitializer.MF_PORTFOLIO_TABLE
-				+ " where name=?";
-		ResultSet rs = CassandraWrapper.getResultSet(query, name);
+				+ " where lname=? allow filtering";
+		ResultSet rs = CassandraWrapper.getResultSet(query, name.toLowerCase());
 		List<Row> rows = rs.all();
 		if (rows.isEmpty()) {
 			return null;
@@ -74,6 +77,21 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 
 		Row r = rows.get(0);
 		return getMutualFundPortfolio(r);
+	}
+
+	public Map<String, String> getMutualFundPortfolioNameMap() {
+		String query = "select name, lname from " + DatabaseInitializer.MF_PORTFOLIO_TABLE;
+		ResultSet rs = CassandraWrapper.getResultSet(query);
+		List<Row> rows = rs.all();
+		if (rows.isEmpty()) {
+			return null;
+		}
+
+		Map<String, String> lNameToNameMap = new HashMap<>();
+		for (Row r : rows) {
+			lNameToNameMap.put(r.getString(1), r.getString(0));
+		}
+		return lNameToNameMap;
 	}
 
 	private MutualFundPortfolio getMutualFundPortfolio(Row r) {
