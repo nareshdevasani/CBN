@@ -37,7 +37,7 @@ public class InstrumentCRUD implements CRUD<Instrument> {
 		String query = "select name, symbol, sector, segment, isin, securitycode, listingdate, marketcap, mcaptype from "
 				+ DatabaseInitializer.INSTRUMENT_TABLE
 				+ " where isin=?";
-		ResultSet rs = CassandraWrapper.getResultSet(query, object.getIsin());
+		ResultSet rs = CassandraWrapper.executeQueryWithParams(query, object.getIsin());
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
 			System.out.println("NEW:" + object);
@@ -60,7 +60,7 @@ public class InstrumentCRUD implements CRUD<Instrument> {
 		String query = "select name, symbol, sector, segment, isin, securitycode, listingdate, marketcap from "
 				+ DatabaseInitializer.INSTRUMENT_TABLE
 				+ " where isin=?";
-		ResultSet rs = CassandraWrapper.getResultSet(query, isin);
+		ResultSet rs = CassandraWrapper.executeQueryWithParams(query, isin);
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
 			return getInstrument (rows.get(0));

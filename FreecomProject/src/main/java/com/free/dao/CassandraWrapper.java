@@ -17,7 +17,7 @@ public class CassandraWrapper {
 		session = cluster.connect("freecom");
 	}
 
-	public static ResultSet getResultSet(String query, Object... args) {
+	public static ResultSet executeQueryWithParams(String query, Object... args) {
 		PreparedStatement pStatement = session.prepare(query);
 		Statement statement = pStatement.bind(args);
 

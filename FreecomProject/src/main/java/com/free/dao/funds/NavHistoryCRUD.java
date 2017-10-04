@@ -1,5 +1,6 @@
 package com.free.dao.funds;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -14,7 +15,6 @@ import com.free.dao.CassandraWrapper;
 import com.free.dao.DatabaseInitializer;
 import com.free.interfaces.dao.CRUD;
 import com.free.pojos.funds.MutualFund;
-import com.sun.xml.internal.bind.unmarshaller.Messages;
 
 public class NavHistoryCRUD {
 
@@ -25,7 +25,7 @@ public class NavHistoryCRUD {
 
 		for (Entry<String, Map<Date, Float>> entry : navHistory.entrySet()) {
 			for (Entry<Date, Float> navEntry : entry.getValue().entrySet()) {
-				CassandraWrapper.executeQuery(Messages.format(query, entry.getKey(), navEntry.getValue(), navEntry.getKey()));
+				CassandraWrapper.executeQuery(MessageFormat.format(query, entry.getKey(), navEntry.getValue(), navEntry.getKey()));
 			}
 		}
 	}
@@ -34,7 +34,6 @@ public class NavHistoryCRUD {
 		
 	}
 
-	@Override
 	public MutualFund get(String schemecode) {
 		return null;
 	}
@@ -60,7 +59,7 @@ public class NavHistoryCRUD {
 
 	public Collection<String> getAllSchemeCodes() {
 		String query = "select schemecode from " + DatabaseInitializer.MUTUAL_FUND_TABLE;
-		ResultSet rs = CassandraWrapper.getResultSet(query);
+		ResultSet rs = CassandraWrapper.executeQuery(query);
 		List<Row> rows = rs.all();
 
 		Set<String> schemeCodes = new HashSet<>();

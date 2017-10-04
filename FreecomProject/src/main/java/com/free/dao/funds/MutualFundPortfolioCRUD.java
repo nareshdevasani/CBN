@@ -1,6 +1,7 @@
 package com.free.dao.funds;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,10 +9,12 @@ import java.util.Map;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.free.dao.CassandraWrapper;
 import com.free.dao.DatabaseInitializer;
 import com.free.interfaces.dao.CRUD;
+import com.free.pojos.funds.InstrumentAllocation;
 import com.free.pojos.funds.MutualFundPortfolio;
 
 public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
@@ -46,7 +49,7 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 		String query = "select name, portfolioDate, instruments from "
 				+ DatabaseInitializer.MF_PORTFOLIO_TABLE
 				+ " where name=?";
-		ResultSet rs = CassandraWrapper.getResultSet(query, object.getName());
+		ResultSet rs = CassandraWrapper.executeQueryWithParams(query, object.getName());
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
 //			System.out.println("NEW:" + object);
@@ -55,6 +58,28 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 		}
 
 		return create(object);
+	}
+
+//	public MutualFundPortfolio updateSchemeCode(String schemeCode, String name) {
+//		String query = "update " + DatabaseInitializer.MF_PORTFOLIO_TABLE
+//				+ " set schemecode='" + schemeCode + "' where name=?";
+//		CassandraWrapper.executeQueryWithParams(query, name);
+//
+//		return getBySchemeCode(schemeCode);
+//	}
+
+	public MutualFundPortfolio getBySchemeCode(String schemeCode) {
+		String query = "select name, lname, portfolioDate, instruments from "
+				+ DatabaseInitializer.MF_PORTFOLIO_TABLE
+				+ " where schemecode=? allow filtering";
+		ResultSet rs = CassandraWrapper.executeQueryWithParams(query, schemeCode);
+		List<Row> rows = rs.all();
+		if (rows.isEmpty()) {
+			return null;
+		}
+
+		Row r = rows.get(0);
+		return getMutualFundPortfolio(r);
 	}
 
 	@Override
@@ -69,7 +94,7 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 		String query = "select name, lname, portfolioDate, instruments from "
 				+ DatabaseInitializer.MF_PORTFOLIO_TABLE
 				+ " where lname=? allow filtering";
-		ResultSet rs = CassandraWrapper.getResultSet(query, name.toLowerCase());
+		ResultSet rs = CassandraWrapper.executeQueryWithParams(query, name.toLowerCase());
 		List<Row> rows = rs.all();
 		if (rows.isEmpty()) {
 			return null;
@@ -81,13 +106,13 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 
 	public Map<String, String> getMutualFundPortfolioNameMap() {
 		String query = "select name, lname from " + DatabaseInitializer.MF_PORTFOLIO_TABLE;
-		ResultSet rs = CassandraWrapper.getResultSet(query);
+		ResultSet rs = CassandraWrapper.executeQuery(query);
 		List<Row> rows = rs.all();
+		Map<String, String> lNameToNameMap = new HashMap<>();
 		if (rows.isEmpty()) {
-			return null;
+			return lNameToNameMap;
 		}
 
-		Map<String, String> lNameToNameMap = new HashMap<>();
 		for (Row r : rows) {
 			lNameToNameMap.put(r.getString(1), r.getString(0));
 		}
@@ -101,7 +126,7 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 		String instrumentJson = r.getString("instruments");
 		
 		try {
-			mfPortfolio.setPortfolio(mapper.readValue(instrumentJson, List.class));
+			mfPortfolio.setPortfolio(mapper.readValue(instrumentJson, new TypeReference<ArrayList<InstrumentAllocation>>(){}));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

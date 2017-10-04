@@ -1,5 +1,6 @@
 package com.free.dao.funds;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +50,7 @@ public class FundCRUD implements CRUD<MutualFund> {
 		String query = "select name, plan, options, schemecode from "
 				+ DatabaseInitializer.MUTUAL_FUND_TABLE
 				+ " where schemecode=?";
-		ResultSet rs = CassandraWrapper.getResultSet(query, object.getSchemeCode());
+		ResultSet rs = CassandraWrapper.executeQueryWithParams(query, object.getSchemeCode());
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
 			String deleteQuery = "delete from " + DatabaseInitializer.MUTUAL_FUND_TABLE + " where name=$$" + rows.get(0).getString("name") 
@@ -95,10 +96,10 @@ public class FundCRUD implements CRUD<MutualFund> {
 	@Override
 	public MutualFund get(String schemecode) {
 		String query = "select name, plan, options, isin, isinreinvest, fundtype, fundcategory,"
-				+ " fundhouse, manager, expense, nav, repurchasingprice, saleprice, navdate from "
+				+ " fundhouse, manager, expense, nav, repurchasingprice, saleprice, navdate, schemecode from "
 				+ DatabaseInitializer.MUTUAL_FUND_TABLE
 				+ " where schemecode=$$" + schemecode + "$$";
-		ResultSet rs = CassandraWrapper.getResultSet(query);
+		ResultSet rs = CassandraWrapper.executeQuery(query);
 		List<Row> rows = rs.all();
 		if (!rows.isEmpty()) {
 			MutualFund fund = getMutualFundFromRow(rows.get(0));
@@ -124,12 +125,27 @@ public class FundCRUD implements CRUD<MutualFund> {
 		fund.setRePurchagePrice(r.getFloat("repurchasingprice"));
 		fund.setSalePrice(r.getFloat("saleprice"));
 		fund.setNavDate(r.getTimestamp("navdate"));
+		fund.setSchemeCode(r.getString("schemecode"));
 		return fund;
+	}
+
+	public Collection<MutualFund> getAllMutualFunds() {
+		String query = "select * from " + DatabaseInitializer.MUTUAL_FUND_TABLE;
+		ResultSet rs = CassandraWrapper.executeQuery(query);
+		List<Row> rows = rs.all();
+
+		List<MutualFund> funds = new ArrayList<>();
+		if (!rows.isEmpty()) {
+			for (Row row : rows) {
+				funds.add(getMutualFundFromRow(row));
+			}
+		}
+		return funds;
 	}
 
 	public Collection<String> getAllSchemeCodes() {
 		String query = "select schemecode from " + DatabaseInitializer.MUTUAL_FUND_TABLE;
-		ResultSet rs = CassandraWrapper.getResultSet(query);
+		ResultSet rs = CassandraWrapper.executeQuery(query);
 		List<Row> rows = rs.all();
 
 		Set<String> schemeCodes = new HashSet<>();

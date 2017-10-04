@@ -6,10 +6,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.free.dao.funds.FundCRUD;
+import com.free.dao.funds.MutualFundPortfolioCRUD;
+import com.free.dao.funds.api.MutualFundReader;
+import com.free.datahealth.FundToPortfolioMapper;
 import com.free.pojos.funds.FolioCompareResult;
 import com.free.pojos.funds.InstrumentAllocation;
+import com.free.pojos.funds.MutualFund;
 import com.free.pojos.funds.MutualFundPortfolio;
+import com.free.pojos.funds.MutualFundSnapshot;
+import com.free.pojos.funds.PortfolioMatrix;
 import com.free.pojos.funds.UserPortfolio;
+import com.free.pojos.funds.PortfolioMatrix.MatrixHeader;
+import com.free.pojos.funds.PortfolioMatrix.PercentList;
 
 public class PortfolioAnalyzer {
 
@@ -108,5 +117,42 @@ public class PortfolioAnalyzer {
 		result.getRight().addAll(rightLookup.values());
 
 		return result;
+	}
+
+	public static PortfolioMatrix getPortfolioMatrix(List<String> schemeCodes) {
+		List<MatrixHeader> header = new ArrayList<>();
+		for (String schemeCode : schemeCodes) {
+			MutualFund fund = new FundCRUD().get(schemeCode);
+			MatrixHeader head = new MatrixHeader();
+			head.setFundName(fund.getName());
+			head.setSchemeCode(schemeCode);
+			header.add(head);
+		}
+
+		PortfolioMatrix matrix = new PortfolioMatrix(header);
+
+		MutualFundPortfolioCRUD portCrud = new MutualFundPortfolioCRUD();
+		for (int i = 0; i < header.size(); i++) {
+			MatrixHeader head = header.get(i);
+			String portfolioName = FundToPortfolioMapper.getPortfolioFundNameForFundName(head.getSchemeCode(), head.getFundName());
+			MutualFundPortfolio portfolio = portCrud.get(portfolioName);
+			List<InstrumentAllocation> instruments = portfolio.getPortfolio();
+			for (InstrumentAllocation inst : instruments) {
+				matrix.setPercent(inst.getIsin(), inst.getName(), inst.getPercent(), i);
+			}
+		}
+
+		Map<String, PercentList> percentMatrix = matrix.getPercentMatrix();
+		for (int i = 0; i < header.size(); i++) {
+			float totalPercent = 0;
+			for (Entry<String, PercentList> entry : percentMatrix.entrySet()) {
+				if (null != entry.getValue().getPercent()[i]) {
+					totalPercent += entry.getValue().getPercent()[i];
+				}
+			}
+			MatrixHeader head = header.get(i);
+			head.setTotalPercent(totalPercent);
+		}
+		return matrix;
 	}
 }
