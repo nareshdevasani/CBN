@@ -54,42 +54,64 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		System.out.println(instruments.size() + " Instruments are initialized successfully.");
 
 		// initialize commercial papers
-		instruments = getMoneyMarketData("CP", "Commercial Paper");
+		// https://nsdl.co.in/downloadables/list-debt.php
+		instruments = getMoneyMarketData("CP", "Commercial Paper", 0);
 		// 4. persist data
 		persistData(instruments);
 		System.out.println(instruments.size() + " Commercial Papers are initialized successfully.");
 
 		// initialize Certificate of Deposits
-		instruments = getMoneyMarketData("CD", "Certificate of Deposits");
+		// https://nsdl.co.in/downloadables/list-debt.php
+		instruments = getMoneyMarketData("CD", "Certificate of Deposits", 0);
 		// 4. persist data
 		persistData(instruments);
 		System.out.println(instruments.size() + " Certificate of Deposits are initialized successfully.");
 
-		instruments = getMoneyMarketData("debt", "Bonds or Debentures", Segment.OTHER_DEBT);
+		// https://nsdl.co.in/downloadables/list-debt.php
+		instruments = getMoneyMarketData("debt", "Bonds or Debentures", Segment.OTHER_DEBT, 0);
 		// 4. persist data
 		persistData(instruments);
 		System.out.println(instruments.size() + " Bonds or Debentures are initialized successfully.");
 
+		// https://nsdl.co.in/downloadables/list-debt.php
+		instruments = getMoneyMarketData("PS", "Preference Shares", 1);
+		// 4. persist data
+		persistData(instruments);
+		System.out.println(instruments.size() + " Active Preference Shares are initialized successfully.");
+
+		// https://nsdl.co.in/downloadables/list-debt.php
+		instruments = getMoneyMarketData("SI", "Bonds or Debentures", Segment.OTHER_DEBT, 1);
+		// 4. persist data
+		persistData(instruments);
+		System.out.println(instruments.size() + " Active Securitised Instruments are initialized successfully.");
+
+		// https://www.rbi.org.in/scripts/bs_viewcontent.aspx?Id=1956
 		instruments = getGSecData();
 		// 4. persist data
 		persistData(instruments);
 		System.out.println(instruments.size() + " Government Securities are initialized successfully.");
 
+		// https://www.nseindia.com/products/content/debt/wdm/homepage_wdm_monthly.htm
 		instruments = getTreasuryData();
 		// 4. persist data
 		persistData(instruments);
 		System.out.println(instruments.size() + " Treasury Bills are initialized successfully.");
 
+		// https://www.nseindia.com/products/content/equities/mutual_funds/amc.htm
 		instruments = getMutualFundData("MF", 0, 2, 4);
 		// 4. persist data
 		persistData(instruments);
 		System.out.println(instruments.size() + " Mutual Funds are initialized successfully.");
 
+		// https://www.nseindia.com/corporates/content/securities_info.htm
+		// https://www.nseindia.com/content/equities/eq_etfseclist.csv
 		instruments = getMutualFundData("MF-ETF", 0, 2, 5);
 		// 4. persist data
 		persistData(instruments);
 		System.out.println(instruments.size() + " Mutual Fund ETFs are initialized successfully.");
 
+		// https://www.nseindia.com/products/content/all_daily_reports.htm
+		// https://www.nseindia.com/content/equities/mf_close-end.csv
 		instruments = getMutualFundData("MF-Close", 0, 1, 6);
 		// 4. persist data
 		persistData(instruments);
@@ -156,11 +178,11 @@ public class InstrumentInitializer implements PortfolioInitializer {
 		}
 	}
 
-	private List<Instrument> getMoneyMarketData(String folder, String sector) {
-		return getMoneyMarketData(folder, sector, Instrument.Segment.MONEY_MARKET);
+	private List<Instrument> getMoneyMarketData(String folder, String sector, int start) {
+		return getMoneyMarketData(folder, sector, Instrument.Segment.MONEY_MARKET, start);
 	}
 
-	private List<Instrument> getMoneyMarketData(String folder, String sector, Segment segment) {
+	private List<Instrument> getMoneyMarketData(String folder, String sector, Segment segment, int start) {
 		List<Instrument> instruments = new ArrayList<>();
 
 		Workbook wb = null;
@@ -178,21 +200,21 @@ public class InstrumentInitializer implements PortfolioInitializer {
 				while(rowIterator.hasNext()) {
 					Row row = rowIterator.next();
 					inst = new Instrument();
-					Cell nameCell = row.getCell(0);
+					Cell nameCell = row.getCell(start);
 					if (null == nameCell || nameCell.getCellTypeEnum() != CellType.STRING) {
 						continue;
 					}
 					inst.setName(nameCell.getStringCellValue());
 	
-					Cell isinCell = row.getCell(1);
+					Cell isinCell = row.getCell(start + 1);
 					if (null == isinCell || isinCell.getCellTypeEnum() != CellType.STRING) {
 						continue;
 					}
 
 					inst.setIsin(isinCell.getStringCellValue());
 
-					if ("debt".equals(folder)) {
-						Cell couponCell = row.getCell(8);
+					if ("debt".equals(folder) || "SI".equals(folder)) {
+						Cell couponCell = row.getCell(start + 8);
 						if (null != couponCell) {
 							if (couponCell.getCellTypeEnum() == CellType.NUMERIC) {
 								inst.setSymbol(couponCell.getNumericCellValue() + "");

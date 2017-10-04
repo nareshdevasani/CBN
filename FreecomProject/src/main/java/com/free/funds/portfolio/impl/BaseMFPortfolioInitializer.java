@@ -47,6 +47,9 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 	public abstract String getPortfolioDatePrefix();
 	public abstract String getPortfolioDateFormat();
 
+	public boolean isDateCell(Cell dateCell) {
+		return null != dateCell && dateCell.getCellTypeEnum() == CellType.STRING;
+	}
 	public int getPortfolioDateCellNumber() {
 		return 1;
 	}
@@ -159,7 +162,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 							continue;
 						}
 						String name = nameCell.getStringCellValue();
-						if (name.isEmpty() || name.toLowerCase().endsWith("total")) {
+						if (name.isEmpty()) {
 							continue;
 						}
 
@@ -173,6 +176,15 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 						}
 
 						if (percent == 0.0) {
+							continue;
+						}
+
+						// another case for avoiding invalid instruments
+						if (percent == 100 && name.toLowerCase().endsWith("total")) {
+							break;
+						}
+
+						if (name.toLowerCase().endsWith("total")) {
 							continue;
 						}
 
@@ -222,7 +234,7 @@ public abstract class BaseMFPortfolioInitializer implements PortfolioInitializer
 		while(rows.hasNext()) {
 			Row row = rows.next();
 			Cell dateCell = row.getCell(dateCellNum);
-			if (null == dateCell || dateCell.getCellTypeEnum() != CellType.STRING) {
+			if (!isDateCell(dateCell)) {
 				continue;
 			}
 			String dateStr = dateCell.getStringCellValue();

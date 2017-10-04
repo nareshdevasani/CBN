@@ -1,5 +1,8 @@
 package com.free.funds.portfolio.impl;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+
 public class UnionKBCMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
@@ -50,6 +53,13 @@ public class UnionKBCMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 	@Override
 	public String getPortfolioDateFormat() {
 		return "MMM dd,yyyy";
+	}
+
+	@Override
+	public boolean isDateCell(Cell dateCell) {
+		return null != dateCell
+				&& (dateCell.getCellTypeEnum() == CellType.STRING 
+				|| dateCell.getCellTypeEnum() == CellType.FORMULA);
 	}
 
 	public static void main(String[] args) {

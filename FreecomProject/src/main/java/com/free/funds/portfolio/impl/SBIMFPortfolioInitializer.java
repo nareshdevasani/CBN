@@ -81,8 +81,8 @@ public class SBIMFPortfolioInitializer implements PortfolioInitializer {
 
 					// identify fund name
 					String fundName = sheet.getRow(1).getCell(1).getStringCellValue();
-					System.out.println(sheet.getSheetName() + " -> " + fundName);
 					Date portfolioDate = sheet.getRow(2).getCell(1).getDateCellValue();
+					System.out.println(sheet.getSheetName() + " -> " + fundName + ", date: " + portfolioDate);
 
 					MutualFundPortfolio fundPortfolio = new MutualFundPortfolio();
 					fundPortfolio.setName(fundName);

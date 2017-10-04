@@ -61,6 +61,10 @@ public class FTMFPortfolioInitializer implements PortfolioInitializer {
 				while(index < count) {
 					Sheet sheet = wb.getSheetAt(index);
 
+					if (null == sheet.getRow(0)) {
+						index++;
+						continue;
+					}
 					// identify fund name
 					String fundName = sheet.getRow(0).getCell(1).getStringCellValue();
 					if (fundName.isEmpty()) {

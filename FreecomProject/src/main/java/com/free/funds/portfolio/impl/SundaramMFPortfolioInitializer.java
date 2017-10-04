@@ -34,8 +34,26 @@ public class SundaramMFPortfolioInitializer implements PortfolioInitializer {
 	private int dateCellNum = 0;
 	private int instNameCellNum = 2;
 	private int instIsinCellNum = 1;
+	private int percentMul = 100;
+
 	public String getMFName() {
 		return "Sundaram";
+	}
+
+	public boolean initializeSheet(String sheetName, int index) {
+		switch(sheetName) {
+		case "GLOBAL":
+			percentMul = 1;
+			break;
+		case "XDO_METADATA":
+		case "Derivative Disclosure":
+			return false;
+		default:
+			percentMul = 100;
+			break;
+		}
+
+		return true;
 	}
 
 	public int getFundNameRowNumber() {
@@ -59,7 +77,7 @@ public class SundaramMFPortfolioInitializer implements PortfolioInitializer {
 	}
 
 	public int getInstrumentPercentMultiplier() {
-		return 100;
+		return percentMul;
 	}
 
 	public String getPortfolioDatePrefix() {
@@ -125,6 +143,8 @@ public class SundaramMFPortfolioInitializer implements PortfolioInitializer {
 			dateCellNum = 0;
 			instNameCellNum = 2;
 			instIsinCellNum = 1;
+
+			System.out.println("File name currently parsing - " + file.getName());
 			try {
 				wb = WorkbookFactory.create(file);
 
@@ -133,10 +153,12 @@ public class SundaramMFPortfolioInitializer implements PortfolioInitializer {
 				while(index < count) {
 					Sheet sheet = wb.getSheetAt(index);
 					String sheetName = sheet.getSheetName();
-					if ("XDO_METADATA".equals(sheetName)) {
+					boolean parseSheet = initializeSheet(sheetName.trim(), index);
+					if (!parseSheet) {
 						index++;
 						continue;
 					}
+
 					if ("global".equals(sheetName)) {
 						fundNameRowNum = 0;
 						percentCellNum = 5;

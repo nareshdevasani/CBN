@@ -2,6 +2,8 @@ package com.free.funds.portfolio.impl;
 
 public class EdelweissMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
+	private String fundName = "";
+
 	@Override
 	public String getMFName() {
 		return "Edelweiss";
@@ -14,22 +16,22 @@ public class EdelweissMFPortfolioInitializer extends BaseMFPortfolioInitializer 
 
 	@Override
 	public int getFundNameCellNumber() {
-		return 1;
+		return 0;
 	}
 
 	@Override
 	public int getInstrumentNameCellNumber() {
-		return 1;
+		return 0;
 	}
 
 	@Override
 	public int getInstrumentPercentCellNumber() {
-		return 6;
+		return 5;
 	}
 
 	@Override
 	public int getInstrumentIsinCellNumber() {
-		return 2;
+		return 1;
 	}
 
 	@Override
@@ -38,13 +40,31 @@ public class EdelweissMFPortfolioInitializer extends BaseMFPortfolioInitializer 
 	}
 
 	@Override
+	public int getPortfolioDateCellNumber() {
+		return 0;
+	}
+
+	@Override
 	public String getPortfolioDatePrefix() {
-		return "Portfolio as on";
+		return "PORTFOLIO STATEMENT OF " + fundName + " AS ON";
+	}
+
+	@Override
+	public String normalizeFundName(String name) {
+		int end = name.indexOf("AS ON");
+		int start = "PORTFOLIO STATEMENT OF".length();
+		if(end >= 0) {
+			fundName = name.substring(start, end).trim();
+		} else {
+			fundName = name;
+		}
+
+		return fundName;
 	}
 
 	@Override
 	public String getPortfolioDateFormat() {
-		return "MMM dd,yyyy";
+		return "MMM dd, yyyy";
 	}
 
 	public static void main(String[] args) {

@@ -33,4 +33,19 @@ public class MutualFundPortfolio implements DataObject {
 	public void setPortfolio(List<InstrumentAllocation> portfolio) {
 		this.portfolio = portfolio;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		b.append("Name: " + getName())
+		.append("\n")
+		.append("Date: " + getDate())
+		.append("\n")
+		.append("Portfolio Details: \n")
+		.append("ISIN \t\t Percent \t Name \t \n");
+		for (InstrumentAllocation alloc : portfolio) {
+			b.append(alloc.getIsin() + "\t" + alloc.getPercent() + "\t" + alloc.getName() + "\n");
+		}
+		return b.toString();
+	}
 }

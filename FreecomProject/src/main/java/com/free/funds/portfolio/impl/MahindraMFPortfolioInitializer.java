@@ -12,32 +12,32 @@ public class MahindraMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 		return "Mahindra";
 	}
 
-	@Override
-	public boolean initializeSheet(String sheetName, int index) {
-		switch(sheetName) {
-		case "MMF Kar Bachat Yojana":
-			fundNameCellNum = 0;
-			instNameCellNum = 0;
-			instPercentCellNum = 5;
-			instIsinCellNum = 1;
-			break;
-		case "Mahindra Liquid Fund":
-		default:
-			fundNameCellNum = 1;
-			instNameCellNum = 1;
-			instPercentCellNum = 6;
-			instIsinCellNum = 2;
-			break;
-		case "MMF02":
-			return false;
-		}
-
-		return true;
-	}
+//	@Override
+//	public boolean initializeSheet(String sheetName, int index) {
+//		switch(sheetName) {
+//		case "MMF Kar Bachat Yojana":
+//			fundNameCellNum = 0;
+//			instNameCellNum = 0;
+//			instPercentCellNum = 5;
+//			instIsinCellNum = 1;
+//			break;
+//		case "Mahindra Liquid Fund":
+//		default:
+//			fundNameCellNum = 1;
+//			instNameCellNum = 1;
+//			instPercentCellNum = 6;
+//			instIsinCellNum = 2;
+//			break;
+//		case "MMF02":
+//			return false;
+//		}
+//
+//		return true;
+//	}
 
 	@Override
 	public int getFundNameRowNumber() {
-		return 0;
+		return 2;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class MahindraMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public int getPortfolioDateCellNumber() {
-		return -1;
+		return 1;
 	}
 
 	@Override
@@ -77,13 +77,13 @@ public class MahindraMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public String getPortfolioDateFormat() {
-		return "MMM dd,yyyy";
+		return "MMM dd, yyyy";
 	}
 
-	@Override
-	public String normalizeFundName(String name) {
-		return name.split("\n")[2];
-	}
+//	@Override
+//	public String normalizeFundName(String name) {
+//		return name.split("\n")[2];
+//	}
 
 	public static void main(String[] args) {
 		new MahindraMFPortfolioInitializer().initialize();

@@ -2,9 +2,33 @@ package com.free.funds.portfolio.impl;
 
 public class MotilalOswalMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
+	private int instPercentCellNum = 9;
+	private int instIsinCellNum = 4;
+
 	@Override
 	public String getMFName() {
 		return "MotilalOswal";
+	}
+
+	@Override
+	public boolean initializeSheet(String sheetName, int index) {
+		switch(sheetName) {
+		case "USTBF":
+		case "M50":
+		case "MCAP100":
+			instPercentCellNum = 8;
+			break;
+		case "N100":
+			instPercentCellNum = 6;
+			instIsinCellNum = 2;
+			break;
+		default:
+			instPercentCellNum = 9;
+			instIsinCellNum = 4;
+			break;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -24,12 +48,12 @@ public class MotilalOswalMFPortfolioInitializer extends BaseMFPortfolioInitializ
 
 	@Override
 	public int getInstrumentPercentCellNumber() {
-		return 8;
+		return instPercentCellNum;
 	}
 
 	@Override
 	public int getInstrumentIsinCellNumber() {
-		return 4;
+		return instIsinCellNum;
 	}
 
 	@Override

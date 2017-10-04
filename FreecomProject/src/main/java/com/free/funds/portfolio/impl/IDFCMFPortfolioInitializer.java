@@ -9,7 +9,7 @@ public class IDFCMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public int getFundNameRowNumber() {
-		return 4;
+		return 3;
 	}
 
 	@Override
@@ -39,12 +39,12 @@ public class IDFCMFPortfolioInitializer extends BaseMFPortfolioInitializer {
 
 	@Override
 	public String getPortfolioDatePrefix() {
-		return "Monthly Portfolio Statement as on";
+		return "PORTFOLIO STATEMENT AS ON";
 	}
 
 	@Override
 	public String getPortfolioDateFormat() {
-		return "MMM dd,yyyy";
+		return "MMM dd, yyyy";
 	}
 
 	@Override
