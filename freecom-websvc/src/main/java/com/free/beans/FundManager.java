@@ -12,6 +12,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 import com.free.dao.funds.api.MutualFundReader;
 import com.free.funds.analyze.impl.PortfolioAnalyzer;
@@ -27,14 +28,14 @@ public class FundManager {
 
 	@POST
 	@Consumes ({"text/xml", "application/json"})
-	@Produces ({"text/xml", "application/json"})
+	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public MutualFund createMutualFund(MutualFund fund) {
 		return fund;
 	}
 
 	@GET
 	@Path("get-fund")
-	@Produces ({"text/xml", "application/json"})
+	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public MutualFund getFund(@QueryParam("name") String name, @QueryParam("plan") String plan, @QueryParam("options") String options) {
 		MutualFund fund = new MutualFund();
 		fund.setName(name);
@@ -46,14 +47,14 @@ public class FundManager {
  
 	@GET
 	@Path("all-funds")
-	@Produces ({"text/xml", "application/json"})
+	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public Collection<MutualFund> getAllFunds() {
 		return MutualFundReader.getAllMutualFunds();
 	}
 
 	@GET
 	@Path("fund-snapshot")
-	@Produces ({"text/xml", "application/json"})
+	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public MutualFundSnapshot getFundSnapshot(@QueryParam("schemecode") String schemeCode) {
 		System.out.println("Entered....");
 		return MutualFundReader.getMutualFundSnapshot(schemeCode);
@@ -61,7 +62,7 @@ public class FundManager {
 
 	@GET
 	@Path("portfolio-matrix")
-	@Produces ({"text/xml", "application/json"})
+	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public PortfolioMatrix getPortfolioMatrix(List<String> schemeCodes) {
 		return PortfolioAnalyzer.getPortfolioMatrix(schemeCodes);
 	}
