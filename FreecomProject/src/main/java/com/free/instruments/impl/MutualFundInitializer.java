@@ -25,7 +25,7 @@ public class MutualFundInitializer implements PortfolioInitializer {
 			}
 		}
 
-		System.out.println("Finished loading mutual fund and their NAVs");
+		System.out.println("Finished loading mutual fund and their NAVs. Count: " + count);
 		return true;
 	}
 

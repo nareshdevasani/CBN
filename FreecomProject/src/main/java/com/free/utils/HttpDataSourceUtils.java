@@ -169,10 +169,12 @@ public final class HttpDataSourceUtils {
 		sname = sname.replace("Div Reinvest.", "");
 		sname = sname.replace("Div Reinvest", "");
 		sname = sname.replace("Growth Option", "");
+		sname = sname.replace("Growth Plan", "");
 		sname = sname.replace("GROWTH OPTION", "");
 		sname = sname.replace("Growth option", "");
 		sname = sname.replace("Bonus Option", "");
 		sname = sname.replace("Dividend Option", "");
+		sname = sname.replace("Dividend Plan", "");
 		sname = sname.replace("dividend option", "");
 		sname = sname.replace("DIVIDEND OPTION", "");
 		sname = sname.replace("Dividend option", "");
