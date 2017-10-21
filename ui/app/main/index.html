@@ -1,16 +1,27 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Create Form Using jQuery - Demo Preview</title>
+		<title>MF Home</title>
 		<link href="main.css" rel="stylesheet">
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<link href="3rdparty/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet">
+		<link href="3rdparty/Guriddo_jqGrid_JS_5.2.1/css/ui.jqgrid.css" rel="stylesheet">
+
+		<script src="3rdparty/jquery-3.2.1.min.js"></script>
+		<script src="3rdparty/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+		<script src="3rdparty/Guriddo_jqGrid_JS_5.2.1/js/jquery.jqGrid.min.js"></script>
+		<script src="3rdparty/Guriddo_jqGrid_JS_5.2.1/js/i18n/grid.locale-en.js"></script>
+
 		<script src="mainform.js"></script>
 	</head>
 	<body>
 		<div id="container">
-		<h2>Dynamically Created Form Using jQuery</h2>
-		<div id="form1">
-		<!-- Dynamic Form Div -->
+		<h2>Chose the MF to see it's Portfolio</h2>
+		<div class="ui-widget">
+			<label for="MFs">Chose MF: </label>
+			<input id="mfchoser">
+		</div>
+		<div class="ui-widget-grid">
+			<table id="portfolio-grid"></table>
 		</div>
 		</div>
 	</body>

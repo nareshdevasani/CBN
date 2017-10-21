@@ -17,7 +17,9 @@ import javax.ws.rs.core.MediaType;
 import com.free.dao.funds.api.MutualFundReader;
 import com.free.funds.analyze.impl.PortfolioAnalyzer;
 import com.free.funds.portfolio.impl.PortfolioUtils;
+import com.free.pojos.funds.InstrumentAllocation;
 import com.free.pojos.funds.MutualFund;
+import com.free.pojos.funds.MutualFundPortfolio;
 import com.free.pojos.funds.MutualFundSnapshot;
 import com.free.pojos.funds.PortfolioMatrix;
 
@@ -27,7 +29,7 @@ import com.free.pojos.funds.PortfolioMatrix;
 public class FundManager {
 
 	@POST
-	@Consumes ({"text/xml", "application/json"})
+	@Consumes ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public MutualFund createMutualFund(MutualFund fund) {
 		return fund;
@@ -60,10 +62,19 @@ public class FundManager {
 		return MutualFundReader.getMutualFundSnapshot(schemeCode);
 	}
 
+  @GET
+  @Path("fund-portfolio")
+ 	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+	public Collection<InstrumentAllocation> getFundPortfolio(@QueryParam("schemecode") String schemeCode) {
+	  System.out.println("Entered portfolio....");
+	  MutualFundPortfolio result = MutualFundReader.getMutualFundPortfolio(schemeCode);
+	  return result.getPortfolio();
+	}
+
 	@GET
 	@Path("portfolio-matrix")
 	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-	public PortfolioMatrix getPortfolioMatrix(List<String> schemeCodes) {
+	public PortfolioMatrix getPortfolioMatrix(@QueryParam("schemecode") List<String> schemeCodes) {
 		return PortfolioAnalyzer.getPortfolioMatrix(schemeCodes);
 	}
 
@@ -83,10 +94,10 @@ public class FundManager {
 			System.out.println(mf);
 			if (mf.getName().contains("High Growth Companies")) {
 				highGrowth = mf.getSchemeCode();
-			} else if (mf.getName().contains("SBI BLUE CHIP")) {
-				sbiBluechip = mf.getSchemeCode();
-			} else if (mf.getName().contains("SBI Magnum Multicap")) {
-				multicap = mf.getSchemeCode();
+//			} else if (mf.getName().contains("SBI BLUE CHIP")) {
+//				sbiBluechip = mf.getSchemeCode();
+//			} else if (mf.getName().contains("SBI Magnum Multicap")) {
+//				multicap = mf.getSchemeCode();
 			}
 //				MutualFundSnapshot snapshot = new FundManager().getFundSnapshot(mf.getSchemeCode());
 //				System.out.println(snapshot);
@@ -101,6 +112,7 @@ public class FundManager {
 		if (null != multicap) {
 			schemeCodes.add(multicap);
 		}
+		schemeCodes.add("112093");
 		PortfolioMatrix matrix = PortfolioAnalyzer.getPortfolioMatrix(schemeCodes);
 		System.out.println(matrix);
 	}

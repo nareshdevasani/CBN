@@ -1,32 +1,58 @@
 $(document).ready(function() {
-$("div#form1").append(
-// Creating Form Div and Adding <h2> and <p> Paragraph Tag in it.
-$("<h3/>").text("Contact Form"), $("<p/>").text("This is my form. Please fill it out. It's awesome!"), $("<form/>", {
-action: '#',
-method: '#'
-}).append(
-// Create <form> Tag and Appending in HTML Div form1.
-$("<input/>", {
-type: 'text',
-id: 'vname',
-name: 'name',
-placeholder: 'Your Name'
-}), // Creating Input Element With Attribute.
-$("<input/>", {
-type: 'text',
-id: 'vemail',
-name: 'email',
-placeholder: 'Your Email'
-}), $("<textarea/>", {
-rows: '5px',
-cols: '27px',
-type: 'text',
-id: 'vmsg',
-name: 'msg',
-placeholder: 'Message'
-}), $("<br/>"), $("<input/>", {
-type: 'submit',
-id: 'submit',
-value: 'Submit'
-})))
+
+  console.log("document ready called...");
+
+  $.ajax( {
+    url: "freecom/apis/funds/all-funds",
+    dataType: "json",
+    /*data: {
+      term: request.term
+    },*/
+    success: function( data ) {
+      var result = [];
+      for (var elem in data) {
+        result.push({'value': data[elem]['schemeCode'], 'label': data[elem]['name']});
+      }
+      // response( result );
+
+      $("#mfchoser").autocomplete({
+           source: result,
+           minLength: 2,
+           select: function( event, ui ) {
+             event.preventDefault();
+             $("#mfchoser").val(ui.item.label);
+             console.log( "Selected: " + ui.item.value + " aka " + ui.item.label );
+
+             $("#portfolio-grid").jqGrid('setGridParam',{url:"freecom/apis/funds/fund-portfolio?schemecode=" + ui.item.value});
+             $("#portfolio-grid").jqGrid('setCaption',"Portforio Details of " + ui.item.label)
+             				.trigger('reloadGrid');
+           },
+           focus: function(event, ui) {
+             event.preventDefault();
+             $("#mfchoser").val(ui.item.label);
+           }
+         } );
+    }
+  } );
+
+  jQuery("#portfolio-grid").jqGrid({
+  	height: 600,
+    url:'',
+  	datatype: "json",
+     	colNames:['Instrument Name', 'Percent'],
+     	colModel:[
+     		{name:'name',index:'name', width:300},
+     		{name:'percent', index:'percent', width:100, align:"center", formatter: "number", formatoptions: {decimalPlaces: 3}}
+     	],
+     	rowNum:100,
+     	//rowList:[5,10,20],
+      rownumbers: true,
+     	pager: '#pager10_d',
+     	sortname: 'name',
+      viewrecords: true,
+      sortorder: "asc",
+  	//multiselect: true,
+  	caption:"Portfolio Details"
+  }).navGrid('#pager10_d',{add:false,edit:false,del:false});
+
 });

@@ -5,10 +5,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class PortfolioMatrix {
 
 	private List<MatrixHeader> header;
+
 	private Map<String, PercentList> percentMatrix;
+
+	public PortfolioMatrix() {
+	}
 
 	public PortfolioMatrix(List<MatrixHeader> header) {
 		setHeader(header);
@@ -27,6 +36,8 @@ public class PortfolioMatrix {
 		percentList.getPercent()[schemeIndex] = percent;
 	}
 
+	@XmlElementWrapper(name="header-data")
+	@XmlElement(name="header")
 	public List<MatrixHeader> getHeader() {
 		return header;
 	}
@@ -35,6 +46,7 @@ public class PortfolioMatrix {
 		this.header = header;
 	}
 
+	@XmlElementWrapper(name="percentMatrix")
 	public Map<String, PercentList> getPercentMatrix() {
 		return percentMatrix;
 	}
@@ -75,7 +87,8 @@ public class PortfolioMatrix {
 		return b.toString();
 	}
 
-	public class PercentList {
+	@XmlRootElement
+	public static class PercentList {
 		private String fundName;
 		private Float[] percent;
 
@@ -96,6 +109,7 @@ public class PortfolioMatrix {
 		}
 	}
 
+	@XmlRootElement
 	public static class MatrixHeader {
 		private float totalPercent;
 		private String schemeCode;

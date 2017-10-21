@@ -1,5 +1,8 @@
 package com.free.pojos.funds;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class MutualFundSnapshot {
 
 	private MutualFund fundHeader;

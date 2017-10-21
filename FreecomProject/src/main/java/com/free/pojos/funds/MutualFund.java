@@ -40,26 +40,26 @@ public class MutualFund implements DataObject {
 		this.options = options;
 	}
 
-	public float getExpense() {
+	public Float getExpense() {
 		return expense;
 	}
 	
-	public void setExpense(float expense) {
+	public void setExpense(Float expense) {
 		this.expense = expense;
 	}
 	
-	public float getNav() {
+	public Float getNav() {
 		return nav;
 	}
 	
-	public void setNav(float nav) {
+	public void setNav(Float nav) {
 		this.nav = nav;
 	}
-	
+
 	public String getIsin() {
 		return isin;
 	}
-	
+
 	public void setIsin(String isin) {
 		this.isin = isin;
 	}
@@ -88,19 +88,19 @@ public class MutualFund implements DataObject {
 		this.isinReinvest = isinReinvest;
 	}
 
-	public float getRePurchagePrice() {
+	public Float getRePurchagePrice() {
 		return rePurchagePrice;
 	}
 
-	public void setRePurchagePrice(float rePurchagePrice) {
+	public void setRePurchagePrice(Float rePurchagePrice) {
 		this.rePurchagePrice = rePurchagePrice;
 	}
 
-	public float getSalePrice() {
+	public Float getSalePrice() {
 		return salePrice;
 	}
 
-	public void setSalePrice(float salePrice) {
+	public void setSalePrice(Float salePrice) {
 		this.salePrice = salePrice;
 	}
 
@@ -163,9 +163,9 @@ public class MutualFund implements DataObject {
 
 	private String fundHouse;
 	private String manager;
-	private float expense;
-	private float nav;
+	private Float expense;
+	private Float nav;
 	private Date navDate;
-	private float rePurchagePrice;
-	private float salePrice;
+	private Float rePurchagePrice;
+	private Float salePrice;
 }

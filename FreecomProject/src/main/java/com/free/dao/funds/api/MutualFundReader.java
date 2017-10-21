@@ -6,6 +6,7 @@ import com.free.dao.funds.FundCRUD;
 import com.free.dao.funds.MutualFundPortfolioCRUD;
 import com.free.datahealth.FundToPortfolioMapper;
 import com.free.pojos.funds.MutualFund;
+import com.free.pojos.funds.MutualFundPortfolio;
 import com.free.pojos.funds.MutualFundSnapshot;
 
 public final class MutualFundReader {
@@ -27,4 +28,12 @@ public final class MutualFundReader {
 
 		return snapshot;
 	}
+
+  public static MutualFundPortfolio getMutualFundPortfolio(String schemeCode) {
+    MutualFund fund = new FundCRUD().get(schemeCode);
+    String fundName = fund.getName();
+    String portfolioName = FundToPortfolioMapper.getPortfolioFundNameForFundName(schemeCode, fundName);
+
+    return new MutualFundPortfolioCRUD().get(portfolioName);
+  }
 }

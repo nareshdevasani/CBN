@@ -3,8 +3,11 @@ package com.free.pojos.funds;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.free.interfaces.dao.DataObject;
 
+@XmlRootElement
 public class MutualFundPortfolio implements DataObject {
 	private String name;
 	private Date date;
