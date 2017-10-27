@@ -6,6 +6,56 @@
 		<link href="3rdparty/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet">
 		<link href="3rdparty/Guriddo_jqGrid_JS_5.2.1/css/ui.jqgrid.css" rel="stylesheet">
 
+		<style>
+			.mfcontainer {
+			    /*display: -webkit-flex;
+			    display: flex;
+			    -webkit-flex-flow: row wrap;
+			    flex-flow: row wrap;
+			    text-align: center;*/
+					width: 100%;
+    			border: 1px solid gray;
+			}
+
+			.mfcontainer > * {
+			    padding: 15px;
+			    -webkit-flex: 1 100%;
+			    flex: 1 100%;
+			}
+
+			.article {
+			    text-align: left;
+			}
+
+			header, footer {background: #008080; color:white;}
+			/*footer {background: #aaa; color:white;}
+			.nav {background:#eee;}*/
+
+			nav {
+			    float: left;
+			    max-width: 350px;
+			    margin: 0;
+			    padding: 1em;
+			}
+
+			.nav div {
+			    list-style-type: none;
+			    padding: 0;
+					max-width: 100;
+			}
+			.nav div a {
+			    text-decoration: none;
+			}
+
+			article {
+			    margin-left: 170px;
+			    border-left: 1px solid gray;
+			    padding: 1em;
+			    overflow: hidden;
+			}
+		}
+		</style>
+
 		<script src="3rdparty/jquery-3.2.1.min.js"></script>
 		<script src="3rdparty/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 		<script src="3rdparty/Guriddo_jqGrid_JS_5.2.1/js/jquery.jqGrid.min.js"></script>
@@ -14,15 +64,36 @@
 		<script src="mainform.js"></script>
 	</head>
 	<body>
-		<div id="container">
-		<h2>Chose the MF to see it's Portfolio</h2>
-		<div class="ui-widget">
-			<label for="MFs">Chose MF: </label>
-			<input id="mfchoser">
-		</div>
-		<div class="ui-widget-grid">
-			<table id="portfolio-grid"></table>
-		</div>
+		<div id="mfcontainer">
+			<header>
+				<h1 style="text-align: center">Portfolio View</h1>
+			</header>
+
+			<nav class="nav">
+				<div class="ui-widget">
+					<label for="MFs">Chose MF: </label>
+					<input style="min-width: 350px" id="mfchoser">
+				</div>
+				<br/>
+				<div id="cblist">
+					<fieldset id="cblist_group">
+						<legend>Consolidate Portfolio for </legend>
+					</fieldset>
+				</div>
+				<div id="cblist_hidden" style="display:none" >
+					<fieldset>
+						<label for="checkbox-1" id="cb-label-1">hidden</label><input type="checkbox" name="checkbox-1" id="checkbox-1">
+					</fieldset>
+				</div>
+			</nav>
+
+			<article class="article">
+				<div class="ui-widget-grid">
+					<table id="portfolio-grid"></table>
+				</div>
+			</article>
+
+			<footer style="text-align: center">Copyright &copy; free.com</footer>
 		</div>
 	</body>
 </html>

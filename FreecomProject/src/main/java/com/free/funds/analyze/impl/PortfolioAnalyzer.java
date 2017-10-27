@@ -1,6 +1,7 @@
 package com.free.funds.analyze.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +9,11 @@ import java.util.Map.Entry;
 
 import com.free.dao.funds.FundCRUD;
 import com.free.dao.funds.MutualFundPortfolioCRUD;
-import com.free.dao.funds.api.MutualFundReader;
 import com.free.datahealth.FundToPortfolioMapper;
 import com.free.pojos.funds.FolioCompareResult;
 import com.free.pojos.funds.InstrumentAllocation;
 import com.free.pojos.funds.MutualFund;
 import com.free.pojos.funds.MutualFundPortfolio;
-import com.free.pojos.funds.MutualFundSnapshot;
 import com.free.pojos.funds.PortfolioMatrix;
 import com.free.pojos.funds.UserPortfolio;
 import com.free.pojos.funds.PortfolioMatrix.MatrixHeader;
@@ -36,6 +35,7 @@ public class PortfolioAnalyzer {
 				if (null == instAlloc) {
 					instAlloc = new InstrumentAllocation();
 					instAlloc.setIsin(nextAlloc.getIsin());
+					instAlloc.setName(nextAlloc.getName());
 					instrumentLookup.put(nextAlloc.getIsin(), instAlloc);
 
 					allPortfolio.add(instAlloc);
@@ -48,6 +48,12 @@ public class PortfolioAnalyzer {
 			allAlloc.setPercent(allAlloc.getPercent() / mfPortfolios.size());
 		}
 
+		allPortfolio.sort(new Comparator<InstrumentAllocation>() {
+      @Override
+      public int compare(InstrumentAllocation o1, InstrumentAllocation o2) {
+        return Float.compare(o2.getPercent(), o1.getPercent());
+      }
+    });
 		mfFolio.setName(nameBuff.toString());
 		mfFolio.setPortfolio(allPortfolio);
 		return mfFolio;

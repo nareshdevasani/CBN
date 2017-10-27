@@ -29,7 +29,7 @@ public class PortfolioMatrix {
 		if (null == percentList) {
 			percentList = new PercentList();
 			percentMatrix.put(isin, percentList);
-			percentList.setFundName(name);
+			percentList.setInstName(name);
 			percentList.setPercent(new Float[header.size()]);
 		}
 
@@ -77,7 +77,7 @@ public class PortfolioMatrix {
 				}
 			}
 
-			b.append("\t" + percentList.getFundName() + "(" + total/percentList.getPercent().length + ") \n");
+			b.append("\t" + percentList.getInstName() + "(" + total/percentList.getPercent().length + ") \n");
 		}
 
 		b.append("Total percent\t");
@@ -89,15 +89,15 @@ public class PortfolioMatrix {
 
 	@XmlRootElement
 	public static class PercentList {
-		private String fundName;
+		private String instName;
 		private Float[] percent;
 
-		public String getFundName() {
-			return fundName;
+		public String getInstName() {
+			return instName;
 		}
 
-		public void setFundName(String fundName) {
-			this.fundName = fundName;
+		public void setInstName(String fundName) {
+			this.instName = fundName;
 		}
 
 		public Float[] getPercent() {

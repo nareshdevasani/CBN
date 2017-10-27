@@ -65,9 +65,9 @@ public class FundManager {
   @GET
   @Path("fund-portfolio")
  	@Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-	public Collection<InstrumentAllocation> getFundPortfolio(@QueryParam("schemecode") String schemeCode) {
+	public Collection<InstrumentAllocation> getFundPortfolio(@QueryParam("schemecode") List<String> schemeCodes) {
 	  System.out.println("Entered portfolio....");
-	  MutualFundPortfolio result = MutualFundReader.getMutualFundPortfolio(schemeCode);
+	  MutualFundPortfolio result = MutualFundReader.getMutualFundPortfolio(schemeCodes);
 	  return result.getPortfolio();
 	}
 
