@@ -53,13 +53,27 @@
 			    padding: 1em;
 			    overflow: hidden;
 			}
-		}
+
+			.venntooltip {
+			  position: absolute;
+			  text-align: center;
+			  width: 128px;
+			  height: 16px;
+			  background: #333;
+			  color: #ddd;
+			  padding: 2px;
+			  border: 0px;
+			  border-radius: 8px;
+			  opacity: 0;
+			}
 		</style>
 
 		<script src="3rdparty/jquery-3.2.1.min.js"></script>
 		<script src="3rdparty/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 		<script src="3rdparty/Guriddo_jqGrid_JS_5.2.1/js/jquery.jqGrid.min.js"></script>
 		<script src="3rdparty/Guriddo_jqGrid_JS_5.2.1/js/i18n/grid.locale-en.js"></script>
+		<script src="3rdparty/d3/d3.min.js"></script>
+		<script src="3rdparty/venn/venn.min.js"></script>
 
 		<script src="mainform.js"></script>
 	</head>
@@ -91,6 +105,7 @@
 				<div class="ui-widget-grid">
 					<table id="portfolio-grid"></table>
 				</div>
+				<div id="ui-widget-venn"></div>
 			</article>
 
 			<footer style="text-align: center">Copyright &copy; free.com</footer>

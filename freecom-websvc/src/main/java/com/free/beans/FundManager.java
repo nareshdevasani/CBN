@@ -22,6 +22,7 @@ import com.free.pojos.funds.MutualFund;
 import com.free.pojos.funds.MutualFundPortfolio;
 import com.free.pojos.funds.MutualFundSnapshot;
 import com.free.pojos.funds.PortfolioMatrix;
+import com.free.pojos.funds.PortfolioVennSet;
 
 @Path("/funds")
 @WebService
@@ -70,6 +71,15 @@ public class FundManager {
 	  MutualFundPortfolio result = MutualFundReader.getMutualFundPortfolio(schemeCodes);
 	  return result.getPortfolio();
 	}
+
+  @GET
+  @Path("portfolio-venn-sets")
+  @Produces ({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  public Collection<PortfolioVennSet> getPortfolioVennSets(@QueryParam("schemecode") List<String> schemeCodes) {
+    System.out.println("Entered venn sets....");
+    List<PortfolioVennSet> result = MutualFundReader.getPortfolioVennSets(schemeCodes);
+    return result;
+  }
 
 	@GET
 	@Path("portfolio-matrix")
