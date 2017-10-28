@@ -2,7 +2,7 @@ $(document).ready(function() {
 
   console.log("document ready called...");
 
-  $( "input[type='checkbox']" ).checkboxradio();
+
 
   $.ajax( {
     url: "freecom/apis/funds/all-funds",
@@ -30,17 +30,33 @@ $(document).ready(function() {
               var container = $('#cblist_group');
               var inputs = container.find('input');
               oClone.id = ui.item.value + "-" + inputs.length + 1;
+              oClone.value = ui.item.value;
               labelClone.id = "label-" + oClone.id;
               labelClone.setAttribute("for", oClone.id);
+              labelClone.style.textAlign = "left";
               oClone.setAttribute("name", oClone.id);
               labelClone.innerHTML = ui.item.label;
+              oClone.checked = true;
               document.getElementById("cblist_group").appendChild(labelClone);
               document.getElementById("cblist_group").appendChild(oClone);
 
+              var queryParamFun = function () {
+                var queryParam = "";
+                $("#cblist_group input:checkbox:checked").each(function() {
+                  if (queryParam.length > 1) {
+                    queryParam += "&";
+                  }
+                  queryParam += "schemecode=" + $(this).val();
+                });
+                return queryParam;
+              }
               $( "input[type='checkbox']" ).checkboxradio();
-             $("#portfolio-grid").jqGrid('setGridParam',{url:"freecom/apis/funds/fund-portfolio?schemecode=" + ui.item.value});
-             $("#portfolio-grid").jqGrid('setCaption',"Portforio Details of " + ui.item.label)
-             				.trigger('reloadGrid');
+              $( "input[type='checkbox']" ).on("change", function() {
+
+                $("#portfolio-grid").jqGrid('setGridParam',{url:"freecom/apis/funds/fund-portfolio?" + queryParamFun()}).trigger('reloadGrid');
+              });
+             $("#portfolio-grid").jqGrid('setGridParam',{url:"freecom/apis/funds/fund-portfolio?" + queryParamFun()}).trigger('reloadGrid');
+            //  $("#portfolio-grid").jqGrid;
            },
            focus: function(event, ui) {
              event.preventDefault();
