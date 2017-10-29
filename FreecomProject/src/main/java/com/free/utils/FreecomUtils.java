@@ -7,9 +7,9 @@ public class FreecomUtils {
 
   private static void combination(int arr[], int data[], int start, int end, int index, int r, List<int[]> combinations) {
     if (index == r) {
-      for (int j = 0; j < r; j++)
-        System.out.print(data[j] + " ");
-      System.out.println("");
+//      for (int j = 0; j < r; j++)
+//        System.out.print(data[j] + " ");
+//      System.out.println("");
       int[] dest = new int[data.length];
       System.arraycopy(data, 0, dest, 0, data.length);
       combinations.add(dest);
