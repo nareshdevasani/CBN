@@ -23,10 +23,13 @@ $(document).ready(function() {
              $("#mfchoser").val(ui.item.label);
              console.log( "Selected: " + ui.item.value + " aka " + ui.item.label );
 
-              var oClone = document.getElementById("checkbox-1").cloneNode(true);
-              var labelClone = document.getElementById("cb-label-1").cloneNode(true);
-              var container = $('#cblist_group');
-              var inputs = container.find('input');
+              var oClone = document.getElementById("checkbox-1").cloneNode(true),
+                  labelClone = document.getElementById("cb-label-1").cloneNode(true),
+                  cbListGroupId = "cblist_group",
+                  index = window.groupCount || 0;
+
+              var container = $('#' + cbListGroupId + index),
+                  inputs = container.find('input');
               oClone.id = ui.item.value + "-" + inputs.length + 1;
               oClone.value = ui.item.value;
               labelClone.id = "label-" + oClone.id;
@@ -35,17 +38,29 @@ $(document).ready(function() {
               oClone.setAttribute("name", oClone.id);
               labelClone.innerHTML = ui.item.label;
               oClone.checked = true;
-              document.getElementById("cblist_group").appendChild(labelClone);
-              document.getElementById("cblist_group").appendChild(oClone);
+              document.getElementById(cbListGroupId + index).appendChild(labelClone);
+              document.getElementById(cbListGroupId + index).appendChild(oClone);
 
               var queryParamFun = function () {
-                var queryParam = "";
-                $("#cblist_group input:checkbox:checked").each(function() {
+                var queryParam = "", size = window.groupCount || 0;
+                for (var i = 0; i <= size; i++) {
+                  var groupSchemes = "";
+                  $("#cblist_group" + i +" input:checkbox:checked").each(function() {
+                    if (groupSchemes.length > 1) {
+                      if (i == size) {
+                        groupSchemes += "&schemecode=";
+                      } else {
+                        groupSchemes += "-";
+                      }
+                    }
+                    groupSchemes += $(this).val();
+                  });
                   if (queryParam.length > 1) {
                     queryParam += "&";
                   }
-                  queryParam += "schemecode=" + $(this).val();
-                });
+                  queryParam += "schemecode=" + groupSchemes;
+                }
+
                 return queryParam;
               };
               var reloadDataFun = function () {
@@ -54,14 +69,24 @@ $(document).ready(function() {
                   url: "freecom/apis/funds/portfolio-venn-sets?" + queryParamFun(),
                   dataType: "json",
                   success: function( data ) {
-                    var div = d3.select("#ui-widget-venn");
-                    div.datum(data).call(window.chart);
+                    // remove and add venn div back.
+                    d3.select("#ui-widget-venn").remove();
+                    //d3.select(".venntooltip").remove();
+                    // add div
+                    d3.select(".article").append("div").attr("id", "ui-widget-venn");
 
-                    var tooltip = d3.select("body").append("div").attr("class", "venntooltip");
+                    var div = d3.select("#ui-widget-venn"),
+                        chart = venn.VennDiagram().width(500).height(500);
+
+                    div.datum(data).call(chart);
+
+                    //var tooltip = d3.select("body").append("div").attr("class", "venntooltip");
+
                     div.selectAll("path").style("stroke-opacity", 0).style("stroke", "#fff").style("stroke-width", 3)
                     div.selectAll("g").on("mouseover", function(d, i) {
                           // sort all the areas relative to the current item
                           venn.sortAreas(div, d);
+                          var tooltip = d3.select(".venntooltip");
                           // Display a tooltip with the current size
                           tooltip.transition().duration(400).style("opacity", .9);
                           tooltip.text(d.size + " instruments");
@@ -72,10 +97,12 @@ $(document).ready(function() {
                               .style("stroke-opacity", 1);
                       })
                       .on("mousemove", function() {
+                          var tooltip = d3.select(".venntooltip");
                           tooltip.style("left", (d3.event.pageX) + "px")
                                  .style("top", (d3.event.pageY - 28) + "px");
                       })
                       .on("mouseout", function(d, i) {
+                          var tooltip = d3.select(".venntooltip");
                           tooltip.transition().duration(400).style("opacity", 0);
                           var selection = d3.select(this).transition("tooltip").duration(400);
                           selection.select("path")
@@ -126,6 +153,10 @@ $(document).ready(function() {
     }
   }).navGrid('#pager10_d',{add:false,edit:false,del:false});
 
-  var chart = venn.VennDiagram().width(500).height(500);
-  window.chart = chart;
+  $("#make-grp-btn").button().on("click", function() {
+    window.groupCount = (window.groupCount || 0) + 1;
+    //console.log(window.cblistgrpname + window.groupCount);
+    d3.select("#cblist").append("fieldset").attr("id", "cblist_group" + window.groupCount);
+    d3.select("#cblist_group"+window.groupCount).append("legend").innerHTML="More schemes...";
+  });
 });

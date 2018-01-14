@@ -13,17 +13,16 @@ public class MotilalOswalMFPortfolioInitializer extends BaseMFPortfolioInitializ
 	@Override
 	public boolean initializeSheet(String sheetName, int index) {
 		switch(sheetName) {
-		case "USTBF":
-		case "M50":
-		case "MCAP100":
-			instPercentCellNum = 8;
-			break;
-		case "N100":
-			instPercentCellNum = 6;
-			instIsinCellNum = 2;
+//		case "USTBF":
+//		case "M50":
+//		case "MCAP100":
+//			instPercentCellNum = 8;
+//			break;
+		case "Focused Dynamic":
+			instPercentCellNum = 9;
 			break;
 		default:
-			instPercentCellNum = 9;
+			instPercentCellNum = 8;
 			instIsinCellNum = 4;
 			break;
 		}

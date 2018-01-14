@@ -59,6 +59,8 @@ public class LandTMFPortfolioInitializer implements PortfolioInitializer {
 			try {
 				wb = WorkbookFactory.create(file);
 				int extraIndex = file.getName().endsWith("Debt.xls") ? 1 : 0;
+				int extraIndexName = file.getName().endsWith("Debt.xls") ? 2 : 0;
+				int extraIndexIsin = file.getName().endsWith("Equity.xls") ? 1 : 0;
 
 				int count = wb.getNumberOfSheets();
 				// igonre 1st workbook and read from second
@@ -67,13 +69,19 @@ public class LandTMFPortfolioInitializer implements PortfolioInitializer {
 					Sheet sheet = wb.getSheetAt(index);
 					String sheetName = sheet.getSheetName();
 
+					if ("LTMIP".equalsIgnoreCase(sheetName)) {
+					  extraIndex = 1;
+					  extraIndexName = 2;
+					  extraIndexIsin = 1;
+					}
+
 					// identify fund name
 					String fundName = "";
 					if (null != sheet.getRow(1).getCell(0)) {
 						fundName = sheet.getRow(1).getCell(0).getStringCellValue();
 					}
 					if (fundName.isEmpty()) {
-						fundName = sheet.getRow(1).getCell(1).getStringCellValue();
+						fundName = sheet.getRow(1 + extraIndexName).getCell(1).getStringCellValue();
 					}
 					fundName = fundName.substring(fundName.indexOf(":") + 1, fundName.indexOf('(')).trim();
 
@@ -112,7 +120,7 @@ public class LandTMFPortfolioInitializer implements PortfolioInitializer {
 							continue;
 						}
 
-						Cell isinCell = row.getCell(5 + extraIndex);
+						Cell isinCell = row.getCell(5 + extraIndex + extraIndexIsin);
 						String isin = null == isinCell ? "" : isinCell.getStringCellValue();
 						if (isin.isEmpty()) {
 							continue;

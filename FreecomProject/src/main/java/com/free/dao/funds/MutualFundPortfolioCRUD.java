@@ -68,19 +68,19 @@ public class MutualFundPortfolioCRUD implements CRUD<MutualFundPortfolio> {
 //		return getBySchemeCode(schemeCode);
 //	}
 
-	public MutualFundPortfolio getBySchemeCode(String schemeCode) {
-		String query = "select name, lname, portfolioDate, instruments from "
-				+ DatabaseInitializer.MF_PORTFOLIO_TABLE
-				+ " where schemecode=? allow filtering";
-		ResultSet rs = CassandraWrapper.executeQueryWithParams(query, schemeCode);
-		List<Row> rows = rs.all();
-		if (rows.isEmpty()) {
-			return null;
-		}
-
-		Row r = rows.get(0);
-		return getMutualFundPortfolio(r);
-	}
+//	public MutualFundPortfolio getBySchemeCode(String schemeCode) {
+//		String query = "select name, lname, portfolioDate, instruments from "
+//				+ DatabaseInitializer.MF_PORTFOLIO_TABLE
+//				+ " where schemecode=? allow filtering";
+//		ResultSet rs = CassandraWrapper.executeQueryWithParams(query, schemeCode);
+//		List<Row> rows = rs.all();
+//		if (rows.isEmpty()) {
+//			return null;
+//		}
+//
+//		Row r = rows.get(0);
+//		return getMutualFundPortfolio(r);
+//	}
 
 	@Override
 	public MutualFundPortfolio delete(String name) {
